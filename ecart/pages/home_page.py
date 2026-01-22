@@ -7,6 +7,8 @@ class HomePage(BasePage):
     # Locators
     LOGIN_LINK = "a[href='/login']"
     LOGIN_HEADING = "//h2[text()='Login to your account']"
+    WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
+    ALL_LINKS = "a[href]"
 
     def __init__(self, page):
         super().__init__(page)
@@ -32,3 +34,15 @@ class HomePage(BasePage):
 
     def get_login_heading(self):
         return self.page.locator(self.LOGIN_HEADING)
+
+    def get_website_heading(self):
+        return self.page.locator(self.WEBSITE_HEADING)
+
+    def get_all_links(self):
+        self.log.info("Getting all links on the page")
+        return self.page.locator(self.ALL_LINKS)
+
+    def get_all_links_count(self):
+        count = self.get_all_links().count()
+        self.log.info(f"Total links found on home page: {count}")
+        return count

@@ -54,3 +54,10 @@ To run tests in a specific browser (e.g., firefox):
 4. Centralize reusable code
 5. Define global environment variable
 6. 
+
+
+# Set up Playwright MCP
+
+install Claude code 
+
+        
