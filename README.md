@@ -38,6 +38,18 @@ To run tests in a specific browser (e.g., firefox):
     
     bash pytest --browser firefox
 
+Run all tests and generate Allure results
+
+        pytest --alluredir=allure-results
+
+Run specific test file
+
+        pytest ecart/tests/test_home.py --alluredir=allure-results
+
+Run with markers
+
+        pytest -m smoke --alluredir=allure-results
+
 ## Project Structure
 
 - `ecart/configs`: Configuration files.
@@ -46,6 +58,12 @@ To run tests in a specific browser (e.g., firefox):
 - `ecart/tests`: Test scripts.
 - `ecart/utils`: Utility functions.
 - `requirements.txt`: Python dependencies.
+
+## reporting flow
+        
+        Running Tests ──→ allure-results/ ──→ allure serve ──→ 📊 Live Report
+                               ↓
+                         allure generate ──→ allure-report/ ──→ 📊 Static HTML
 
 ## Best Practices 
 1. Avoid hard code test data
