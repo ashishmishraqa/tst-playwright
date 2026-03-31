@@ -1,8 +1,8 @@
 ## Instruction
 1. Clone the repository
-        git clone https://github.com/ashishmishra36/tst-playwright.git
+        git clone https://github.com/ashishmishraqa/tst-playwright.git
         cd tst-playwright
-2. create a virtual environment
+2. Create a virtual environment
         python -m venv .venv
 3. Activate a virtual environment
         source .venv/bin/activate (macOS/Linux (bash/zsh))
@@ -12,7 +12,7 @@
 4. Upgrade pip(recommended)
         python -m pip install --upgrade pip
 5. Execute pip install -r requirements.txt
-6. to install all the browsers that playwright supports 
+6. to install all the browsers that Playwright supports 
    playwright install
 
 
