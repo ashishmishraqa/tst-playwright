@@ -148,7 +148,7 @@ def test_end_to_end(playwright: Playwright, fetch_test_data):
     page = context.new_page()
     page.goto('https://rahulshettyacademy.com/client')
     expect(page).to_have_title("Let's Shop")  # assert the page title
-    print(fetch_test_data)
+    # print(fetch_test_data)
 
     # page.locator('#userEmail').fill(fetch_test_data['user'])
     # page.locator('#userPassword').fill(fetch_test_data['password'])

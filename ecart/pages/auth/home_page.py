@@ -1,11 +1,14 @@
 from pages.base_page import BasePage
-from utils.logger import get_logger
+from utilities.logger import get_logger
 
 
 class HomePage(BasePage):
 
+    log = get_logger(__name__)
+
+
     # Locators
-    LOGIN_LINK = "a[href='/login']"
+    MY_ACCOUNT = "a[href='https://naveenautomationlabs.com/opencart/index.php?route=account/login']"
     LOGIN_HEADING = "//h2[text()='Login to your account']"
     WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
     ALL_LINKS = "a[href]"
@@ -21,10 +24,9 @@ class HomePage(BasePage):
         self.log.info(f"Opening home page: {url}")
         self.go_to(url)
 
-    def click_login_link(self):
-        self.wait_for_visible(self.LOGIN_LINK)
-        self.log.info("Clicking login link")
-        self.click(self.LOGIN_LINK)
+    def click_my_account_link(self):
+        self.log.info("Clicking on login link")
+        self.click(self.MY_ACCOUNT)
 
     # ---------------------------
     # Getters

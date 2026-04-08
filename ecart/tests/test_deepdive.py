@@ -3,7 +3,7 @@ import time
 import pytest
 from playwright.sync_api import Page, expect, Playwright
 
-from utils.base_utils import APIUtils
+from utilities.base_utils import APIUtils
 
 fake_no_orders_response ={"data":[],"message":"No Orders"}
 
