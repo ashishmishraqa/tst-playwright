@@ -48,9 +48,10 @@ class BasePage:
     # ---------------------------
     # Click wrapper
     # ---------------------------
-    def click(self, locator: str| Locator):
-        self.page.locator(locator).wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
-        self.page.locator(locator).click()
+    def click(self, locator: str | Locator):
+        resolved_locator = self.page.locator(locator) if isinstance(locator, str) else locator
+        resolved_locator.wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
+        resolved_locator.click()
         self.log.debug(f"Clicked on: {locator}")
 
 
