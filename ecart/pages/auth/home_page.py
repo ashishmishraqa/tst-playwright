@@ -8,7 +8,6 @@ class HomePage(BasePage):
 
 
     # Locators
-    MY_ACCOUNT = "a[href='https://naveenautomationlabs.com/opencart/index.php?route=account/login']"
     LOGIN_HEADING = "//h2[text()='Login to your account']"
     WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
     ALL_LINKS = "a[href]"
@@ -26,7 +25,8 @@ class HomePage(BasePage):
 
     def click_my_account_link(self):
         self.log.info("Clicking on login link")
-        self.click(self.MY_ACCOUNT)
+        login_link = self.page.get_by_role("link", name="Login")
+        self.click(login_link)
 
     # ---------------------------
     # Getters
