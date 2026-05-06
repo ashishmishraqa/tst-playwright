@@ -43,6 +43,15 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps
 
+
+      - name: Install Allure CLI
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y default-jre
+            wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+            tar -zxvf allure-2.27.0.tgz -C /opt/
+            sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+
       - name: Run ${{ matrix.test-suite }} tests
         run: |
           # Use the worker mode specified in the workflow dispatch input, or default to 'auto'
