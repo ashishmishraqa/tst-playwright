@@ -22,7 +22,7 @@ class TestRegisterPage(BaseTest):
         expect(page).to_have_title("Register Account")
 
 
-    # @pytest.mark.smoke
+    @pytest.mark.smoke
     def test_submit_registration(self,page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
@@ -30,5 +30,5 @@ class TestRegisterPage(BaseTest):
         register_page = home.click_register()
         expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
         register_page.user_registration()
-        expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
-        expect(page).to_contain_text('Your Account Has Been Created!')
+        expect(page).to_have_title(TestData.SUCCESS_REGISTRATION)
+

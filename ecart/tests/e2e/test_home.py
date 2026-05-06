@@ -9,7 +9,7 @@ from utilities.logger import get_logger
 class TestHome(BaseTest):
     log = get_logger(__name__)
 
-
+    @pytest.mark.smoke
     def test_verify_title(self, page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
@@ -24,7 +24,7 @@ class TestHome(BaseTest):
         self.log.info("my account link clicked")
         expect(page).to_have_title('Account Login')
 
-
+    @pytest.mark.regression
     def test_count_all_links(self, page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
@@ -34,7 +34,7 @@ class TestHome(BaseTest):
         assert links_count > 0, f"Expected links count to be greater than 0, but found {links_count}"
         self.log.info(f"Test passed: Found {links_count} links on the home page")
 
-
+    @pytest.mark.smoke
     def test_item_search(self, page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)

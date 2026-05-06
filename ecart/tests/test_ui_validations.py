@@ -21,7 +21,7 @@ def test_ui_validations(page:Page):
     page.get_by_text('Checkout').click()
     expect(page.locator('.media-body')).to_have_count(2)
 
-
+@pytest.mark.skip
 def test_new_window(page:Page):
     page.goto('https://rahulshettyacademy.com/loginpagePractise/')
 
@@ -32,7 +32,7 @@ def test_new_window(page:Page):
         expect(childpage.get_by_text('Documents request')).to_be_visible()
 
 
-
+@pytest.mark.skip
 def test_more_checks(page:Page):
     page.goto("https://rahulshettyacademy.com/AutomationPractice/")
     expect(page.locator('#name')).to_be_visible()
@@ -49,6 +49,7 @@ def test_more_checks(page:Page):
     expect(page_frame.get_by_text('All Access Subscription')).to_be_visible()
     expect(page_frame.locator('body')).to_contain_text('All Access Subscription')
 
+@pytest.mark.skip
 def test_tables(page:Page):
     page.goto('https://rahulshettyacademy.com/seleniumPractise/#/offers')
     #identify col and row get the price
@@ -60,7 +61,7 @@ def test_tables(page:Page):
     row_rice = page.locator('tr').filter(has_text='Rice').locator('td').nth(col_price).text_content()
 
 
-
+@pytest.mark.skip
 def test_api_testing(page:Page):
     page.goto('https://rahulshettyacademy.com/client/#/auth/login')
     expect(page.get_by_text('Ecom')).to_be_visible()

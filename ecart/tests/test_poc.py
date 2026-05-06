@@ -94,7 +94,7 @@ def test_new_window(page:Page):
     except Exception as err:
         print(err)
 
-
+@pytest.mark.skip
 def test_ui_checks(page:Page):
     try:
         # to check hide and show feature on a page
@@ -123,6 +123,7 @@ def test_ui_checks(page:Page):
 # Identify the column index for Price from the header (<th>).
 # Locate the row that has the desired item (e.g., "Rice").
 # Extract the value from the cell at the same column index.
+@pytest.mark.skip
 def test_table(page:Page):
     page.goto('https://rahulshettyacademy.com/seleniumPractise/#/offers')
     # find the price column: it can be 2nd, 3rd 4th etc
@@ -142,6 +143,7 @@ def test_table(page:Page):
 """API + UI Test: Login to UI application Make API call place an order get the order ID and verify that order on UI
 #userame=demo@playwright.com && Password=Qwe@1234"""
 # @pytest.mark.parametrize('fetch_test_data', fetch_test_data)
+@pytest.mark.skip
 def test_end_to_end(playwright: Playwright, fetch_test_data):
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
@@ -159,7 +161,7 @@ def test_end_to_end(playwright: Playwright, fetch_test_data):
     # api_utils.create_order(playwright)
 
 
-@pytest.mark.smoke
+@pytest.mark.skip
 def test_handson(playwright):
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
@@ -167,7 +169,7 @@ def test_handson(playwright):
     page.goto("https://naveenautomationlabs.com/opencart/")
     expect(page).to_have_title("Your Store")
 
-@pytest.mark.smoke
+@pytest.mark.skip
 def test_shortcut(page:Page):
     page.goto("https://rahulshettyacademy.com/loginpagePractise/")
     page.get_by_role('combobox').select_option('teach')

@@ -6,15 +6,23 @@ on:
   pull_request:
     branches: [master]
   schedule:
-    - cron: "0 9 * * 4"  # Daily 2 AM
+    - cron: "0 9 * * 4"  # Every Thursday at 9:00 AM UTC
   workflow_dispatch:
+    inputs:
+      worker_mode:
+        description: 'Choose the worker mode for test execution'
+        required: true
+        default: 'auto'
+        options:
+          - auto
+          - 1
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.11, 3.12]
+        python-version: [3.13]
         test-suite: [smoke, regression]
       fail-fast: false
 
@@ -35,8 +43,11 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps
 
-      - name: Run ${{ matrix.test-suite }} tests (Parallel)
+      - name: Run ${{ matrix.test-suite }} tests
         run: |
+          # Use the worker mode specified in the workflow dispatch input, or default to 'auto'
+          WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
+          
           pytest -m ${{ matrix.test-suite }} \
             -n auto \
             --dist loadscope \
