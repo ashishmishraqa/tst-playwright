@@ -17,4 +17,9 @@ class TestData:
     TEXT_EMPTY_CART = '0 item(s) - $0.00'
     CART_TOTAL_1_ITEM = '1 item(s) - $602.00'
     ITEMS_CAROUSEL = ('Harley Davidson','Dell','Disney','Starbucks','Nintendo','NFL','RedBull','Sony','Coca Cola','Burger King','Canon')
+    PRODUCT = "macbook"
 
+
+
+# april.lastname@test.com
+# Test@12345

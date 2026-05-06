@@ -8,7 +8,7 @@ log = get_logger(__name__)
 
 
 def pytest_addoption(parser):
-    parser.addoption("--app-browser", action="store", default="chromium", choices=["firefox", "chromium"])
+    parser.addoption("--app-browser", action="store", default="chromium", choices=["firefox", "chromium", "edge"])
 
 @pytest.fixture()
 def page(request):
@@ -19,7 +19,7 @@ def page(request):
         browser = browser_type.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
-        yield page  # return the page object all the test will be execu
+        yield page  # return the page object all the test will be executed
         browser.close()
 
 

@@ -1,21 +1,15 @@
-# Given an array of integers, find the k-th largest number in it.
-#
-# Example One
-# {
-# "numbers": [5, 1, 10, 3, 2],
-# "k": 2
-# }
+#Given an integer array and a number k, find the k most frequent elements in the array.
 
 
+numbers =  [1, 2, 1, 2, 3, 1]
+k = 1
 
-def pair_sum_sorted_array(numbers, target):
-    # solve using hashmap
-    freq = {} # to store the numbers and teh difference
-    for i in range(len(numbers)):
-        diff = target - numbers[i]
-        if diff in freq:
-            return [numbers.index(diff), i]
-        freq[numbers[i]] = freq.get(numbers[i], 0) + 1
-    return[-1 ,-1]
+# map
 
-print(pair_sum_sorted_array(numbers, target))
+def square(n):
+    return n%2 ==0
+
+lambda n: n%2==0
+
+print(list(map(lambda n: n%2==0, numbers)))
+

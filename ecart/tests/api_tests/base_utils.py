@@ -24,3 +24,10 @@ class APIUtils:
         assert response.ok
         print(f'product found successfully is : {response.json()['data']['productName']}')
 
+
+    def create_orders(self,playwright:Playwright):
+        api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
+        response = api_request.get('/api/ecom/product/get-product-list',)
+
+
+

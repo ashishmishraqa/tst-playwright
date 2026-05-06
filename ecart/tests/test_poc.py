@@ -1,11 +1,11 @@
 import time
+import pytest
 from playwright.sync_api import Page, expect, Playwright
-
-
 
 # Note: by default, playwright will launch in headless mode
 # It has global fixture as playwright provided by pytest-playwright package
 # chromium will support chrome and Edge, can be passed as channel value
+# context = incognito window
 def test_playwright(playwright):
     browser = playwright.chromium.launch(channel = 'chrome', headless=False) # it will return a browser object
     # browser = playwright.firefox.launch(headless=False)  # it will return a browser object
@@ -157,6 +157,30 @@ def test_end_to_end(playwright: Playwright, fetch_test_data):
     # time.sleep(3)
     # api_utils = APIUtils()
     # api_utils.create_order(playwright)
+
+
+@pytest.mark.smoke
+def test_handson(playwright):
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://naveenautomationlabs.com/opencart/")
+    expect(page).to_have_title("Your Store")
+
+@pytest.mark.smoke
+def test_shortcut(page:Page):
+    page.goto("https://rahulshettyacademy.com/loginpagePractise/")
+    page.get_by_role('combobox').select_option('teach')
+    page.get_by_label('username').fill('rahulshettyacademy1')
+    page.get_by_label('password').fill('Learning@830$3mK2')
+    page.locator('#terms').click()
+    #css selector: # for id of element and . for class of the element
+    time.sleep(2)
+    page.get_by_role('button',name='Sign In').click()
+    expect(page.get_by_text('Incorrect')).to_be_visible()
+
+
+
 
 
 

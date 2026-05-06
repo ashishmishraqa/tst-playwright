@@ -1,8 +1,6 @@
 import time
-
 import pytest
 from playwright.sync_api import Page, expect, Playwright
-
 from tests.api_tests.base_utils import APIUtils
 
 fake_no_orders_response ={"data":[],"message":"No Orders"}
@@ -55,7 +53,7 @@ def test_network_2(page:Page):
 def test_inject_cookie(playwright: Playwright):
     api_utils= APIUtils()
     token = api_utils.get_login_token(playwright)
-    log.info(f'token received as : {token}')
+    print(f'token received as : {token}')
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
