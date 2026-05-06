@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tst-playwright"
+version = "1.0.0"
+description = "Playwright Test Automation Framework"
+
+[tool.pytest.ini_options]
+# Parallel execution
+#addopts = "-n auto --dist loadscope -v --tb=short --alluredir=allure-results"
+addopts = [
+    "--html=report.html",
+    "--self-contained-html"
+]
+testpaths = ["ecart/tests"]
+markers = [
+    "smoke: Run smoke tests",
+    "regression: Run regression tests",
+    "critical: Run critical path tests",
+    "ui: UI tests",
+]
+# Enable failed-first re-run
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.pytest-xdist]
+looponfail = false
+numprocesses = "auto"
+
+[tool.allure]
+results_directory = "allure-results"

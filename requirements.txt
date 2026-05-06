@@ -1,22 +1,52 @@
+# ==============================================================================
+# CORE TEST FRAMEWORK & ORCHESTRATION
+# Primary testing engine and execution plugins
+# ==============================================================================
+pytest==9.0.3
+pytest-playwright==0.7.2
+playwright==1.55.0
+pytest-xdist==3.8.0
+pytest-asyncio==1.3.0
+pytest-base-url==2.1.0
+
+# ==============================================================================
+# BROWSER AUTOMATION & VALIDATION
+# Tools for E2E testing and data integrity
+# ==============================================================================
+pydantic==2.13.3
+pyee==13.0.0
+greenlet==3.2.4
+
+# ==============================================================================
+# REPORTING & OBSERVABILITY
+# Integration for Allure results and behavioral tracking
+# ==============================================================================
+allure-pytest==2.16.0
+allure-behave==2.16.0
+Pygments==2.19.2
+pytest-html==3.2.0
+
+# ==============================================================================
+# UTILITIES & DATA GENERATION
+# Environment management and mock data helpers
+# ==============================================================================
+requests==2.33.1
+python-dotenv==1.0.1
+PyYAML==6.0.2
+faker==33.0.0
+python-slugify==8.0.4
+text-unidecode==1.3
+colorama==0.4.6
+
+# ==============================================================================
+# NETWORKING & LOW-LEVEL DEPENDENCIES
+# Pinned to ensure cross-environment consistency
+# ==============================================================================
+urllib3==2.5.0
+idna==3.10
 certifi==2025.8.3
 charset-normalizer==3.4.3
-colorama==0.4.6
-greenlet==3.2.4
-idna==3.10
-iniconfig==2.1.0
 packaging==25.0
-playwright==1.55.0
 pluggy==1.6.0
-pyee==13.0.0
-Pygments==2.19.2
-pytest==8.4.2
-pytest-base-url==2.1.0
-pytest-playwright==0.7.1
-python-slugify==8.0.4
-requests==2.32.5
-text-unidecode==1.3
+iniconfig==2.1.0
 typing_extensions==4.15.0
-urllib3==2.5.0
-allure-pytest==2.15.2
-faker
-pytest-xdist==3.8.0
