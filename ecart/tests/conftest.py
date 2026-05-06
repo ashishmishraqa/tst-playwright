@@ -16,7 +16,7 @@ def page(request):
     with sync_playwright() as p:
         log.info(f"Launching {browser_name} browser")
         browser_type = getattr(p, browser_name)
-        browser = browser_type.launch(headless=False)
+        browser = browser_type.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
         yield page  # return the page object all the test will be executed
