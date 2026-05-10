@@ -1,7 +1,12 @@
 import time
+import token
+from idlelib import browser
+
 import pytest
 from playwright.sync_api import Page, expect, Playwright
-from tests.api_tests.base_utils import APIUtils
+from tests.conftest import page
+from utilities import api_utils
+from utilities.api_utils import APIUtils
 
 fake_no_orders_response ={"data":[],"message":"No Orders"}
 
@@ -49,7 +54,6 @@ def test_network_2(page:Page):
     print(page.locator('.blink_me').text_content())
 
 
-@pytest.mark.skip
 def test_inject_cookie(playwright: Playwright):
     api_utils= APIUtils()
     token = api_utils.get_login_token(playwright)
@@ -57,7 +61,7 @@ def test_inject_cookie(playwright: Playwright):
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
-    # Generate Login token and inject to cookies- local storage
+    # Generate Login token and inject to cookies-local storage
     page.add_init_script(f"""localStorage.setItem('token','{token}')""")
     page.goto('https://rahulshettyacademy.com/client/')
     print('landed on home page!')
@@ -66,5 +70,21 @@ def test_inject_cookie(playwright: Playwright):
     expect(page.get_by_text('Your Orders')).to_be_visible()
     time.sleep(2)
     print('landed on order list page!')
+
+def test_network3(playwright:Playwright):
+    # simulate login
+    api_utils = APIUtils()
+    token = api_utils.get_login_token(playwright)
+    print(f'token received as : {token}')
+    browser = playwright.chromium.launch(headless=False)
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto('https://rahulshettyacademy.com/client')
+    expect(page).to_have_title("Let's Shop")
+    page.add_init_script(f"""localStorage.setItem('token','{token}')""")
+    page.goto('https://rahulshettyacademy.com/client/')
+    print('landed on home page!')
+    time.sleep(2)
+    expect(page.get_by_text('Sign Out')).to_be_visible()
 
 

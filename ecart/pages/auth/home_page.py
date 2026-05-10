@@ -1,7 +1,7 @@
 from pages.auth.login_page import LoginPage
 from pages.base_page import BasePage
 from pages.product.product_page import ProductPage
-from pages.register_page import RegisterPage
+from pages.auth.register_page import RegisterPage
 from utilities.logger import get_logger
 
 
@@ -9,16 +9,18 @@ class HomePage(BasePage):
 
     log = get_logger(__name__)
 
-
-    # Locators
-    MY_ACCOUNT = "'link', name='Login'"
-    LOGIN_HEADING = "//h2[text()='Login to your account']"
-    WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
-    ALL_LINKS = "a[href]"
-    SEARCH_BUTTON = '.fa.fa-search'
-
     def __init__(self, page):
         super().__init__(page)
+
+        # Locators
+        self.MY_ACCOUNT = page.get_by_title('My Account')
+        self.LOGIN = page.get_by_role('link', name='Login')
+        self.REGISTER = page.get_by_role('link', name='Register')
+        self.LOGIN_HEADING = "//h2[text()='Login to your account']"
+        self.SEARCH = page.get_by_role('textbox', name='Search')
+        self.WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
+        self.ALL_LINKS = "a[href]"
+        self.SEARCH_BUTTON = '.fa.fa-search'
 
     # ---------------------------
     # Actions
@@ -29,18 +31,14 @@ class HomePage(BasePage):
 
     def click_login(self):
         self.log.info("Clicking on login link")
-        account_link = self.page.get_by_title('My Account')
-        self.click(account_link)
-        link = self.page.get_by_role('link', name='Login')
-        self.click(link)
+        self.MY_ACCOUNT.click()
+        self.LOGIN.click()
         return LoginPage(self.page)
 
     def click_register(self):
         self.log.info("Clicking on register link")
-        account_link = self.page.get_by_title('My Account')
-        self.click(account_link)
-        link = self.page.get_by_role('link', name='Register')
-        self.click(link)
+        self.MY_ACCOUNT.click()
+        self.REGISTER.click()
         return RegisterPage(self.page)
 
     # ---------------------------
@@ -66,8 +64,7 @@ class HomePage(BasePage):
 
     def search_item(self, search_item):
         self.log.info("Searching item")
-        self.page.get_by_role('textbox', name='Search').fill(search_item)
+        self.SEARCH.fill(search_item)
         self.log.info("Searching item entered in the field")
         self.click(self.SEARCH_BUTTON)
-        return ProductPage
-
+        return ProductPage(self.page)

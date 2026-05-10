@@ -12,7 +12,9 @@ description = "Playwright Test Automation Framework"
 #addopts = "-n auto --dist loadscope -v --tb=short --alluredir=allure-results"
 addopts = [
     "--html=report.html",
-    "--self-contained-html"
+    "--self-contained-html",
+    "--reruns=2",           # Retry failed tests 2 times
+    "--reruns-delay=1"      # Wait 1 second between retries
 ]
 testpaths = ["ecart/tests"]
 markers = [

@@ -1,6 +1,10 @@
 import time
+from idlelib import browser
+
 import pytest
 from playwright.sync_api import Page, expect, Playwright
+from pytest_playwright.pytest_playwright import browser_context_args
+
 
 # Note: by default, playwright will launch in headless mode
 # It has global fixture as playwright provided by pytest-playwright package
@@ -180,6 +184,15 @@ def test_shortcut(page:Page):
     time.sleep(2)
     page.get_by_role('button',name='Sign In').click()
     expect(page.get_by_text('Incorrect')).to_be_visible()
+
+
+def test_basic(playwright: Playwright):
+    browser = playwright.chromium.launch(headless=True)
+    browser_context = browser.new_context()
+    page = browser_context.new_page()
+    page.goto('https://rahulshettyacademy.com/client')
+    expect(page).to_have_title("Let's Shop")
+
 
 
 

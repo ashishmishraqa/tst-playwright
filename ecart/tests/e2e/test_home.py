@@ -1,4 +1,6 @@
 import pytest
+
+from pages.product import product_page
 from tests.test_base import BaseTest
 from pages.auth.home_page import HomePage
 from configs.config import TestData
@@ -38,6 +40,6 @@ class TestHome(BaseTest):
     def test_item_search(self, page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
-        home.search_item(TestData.PRODUCT)
-        # self.log.info(f"product_page title: {product_page.get_product_title()}")
+        product_page = home.search_item(TestData.PRODUCT)
+        self.log.info(f"product_page title: {product_page.get_product_title()}")
         expect(page).to_have_title('Search - macbook')

@@ -1,3 +1,4 @@
+import time
 import pytest
 from playwright.sync_api import expect
 from configs.config import TestData
@@ -20,9 +21,8 @@ class TestCheckout(BaseTest):
         expect(page).to_have_title('Your Store')
         product_page = home.search_item(TestData.PRODUCT)
         expect(page).to_have_title('Search - macbook')
-        product_page.add_item_to_cart(self)
-        product_page.verify_cart()
+        product_page.add_item_to_cart()
+        time.sleep(2)  # Wait for the cart to update
+        amount = product_page.verify_cart()
+        self.log.info(f"Amount of product added: {amount}")
         product_page.click_checkout()
-
-
-
