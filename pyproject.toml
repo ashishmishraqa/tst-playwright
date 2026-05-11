@@ -9,13 +9,13 @@ description = "Playwright Test Automation Framework"
 
 [tool.pytest.ini_options]
 # Parallel execution
-#addopts = "-n auto --dist loadscope -v --tb=short --alluredir=allure-results"
-addopts = [
-    "--html=report.html",
-    "--self-contained-html",
-    "--reruns=2",           # Retry failed tests 2 times
-    "--reruns-delay=1"      # Wait 1 second between retries
-]
+addopts = "-n auto --dist loadscope -v --tb=short --alluredir=allure-results"
+#addopts = [
+#    "--html=report.html",
+#    "--self-contained-html",
+#    "--reruns=0",           # Retry failed tests 2 times
+#    "--reruns-delay=1"      # Wait 1 second between retries
+#]
 testpaths = ["ecart/tests"]
 markers = [
     "smoke: Run smoke tests",

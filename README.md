@@ -78,4 +78,26 @@ Run with markers
 
 install Claude code 
 
+
+# Parallel Execution
+┌─────────────────────────────────────────────────────┐
+│              MASTER PROCESS (Controller)            │
+│  • Discovers tests                                  │
+│  • Distributes to workers                           │
+│  • Collects results                                 │
+└──────────┬────────────┬────────────┬────────────────┘
+           │            │            │
+    ┌──────▼─────┐ ┌───▼──────┐ ┌──▼─────────┐
+    │  WORKER 0  │ │ WORKER 1 │ │ WORKER 2   │
+    │ Browser 1  │ │Browser 2 │ │ Browser 3  │
+    │ Context A  │ │Context B │ │ Context C  │
+    │ Port 9001  │ │Port 9002 │ │ Port 9003  │
+    └────────────┘ └──────────┘ └────────────┘
+         ▲              ▲             ▲
+         │              │             │
+    Isolated      Isolated       Isolated
+    Test Data     Test Data      Test Data
+
+
+                
         

@@ -10,7 +10,7 @@ echo -e "${YELLOW}🧪 Running Playwright Test Suite${NC}"
 
 # Parse arguments
 MARKER=${1:-smoke}
-WORKERS=${2:-auto}
+WORKERS=${2:-1}
 HEADED=${3:-false}
 
 echo -e "${YELLOW}📊 Test Suite: $MARKER | Workers: $WORKERS | Headed: $HEADED${NC}"
