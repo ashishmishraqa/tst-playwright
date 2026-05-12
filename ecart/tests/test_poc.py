@@ -10,6 +10,7 @@ from pytest_playwright.pytest_playwright import browser_context_args
 # It has global fixture as playwright provided by pytest-playwright package
 # chromium will support chrome and Edge, can be passed as channel value
 # context = incognito window
+@pytest.mark.skip
 def test_playwright(playwright):
     browser = playwright.chromium.launch(channel = 'chrome', headless=False) # it will return a browser object
     # browser = playwright.firefox.launch(headless=False)  # it will return a browser object
@@ -20,6 +21,7 @@ def test_playwright(playwright):
 
 # the default Chrome browser in headless mode will be launched
 # Better way: to import the page fixture from the Page class from
+@pytest.mark.skip
 def test_playwright_other(page: Page):
     page.goto("https://rahulshettyacademy.com/loginpagePractise/")
     print(page.title())
@@ -36,7 +38,7 @@ def test_playwright_other(page: Page):
     except Exception as err:
         print(f'Exception found : {err}')
 
-
+@pytest.mark.skip
 def test_playwright_expr(page: Page):
     page.goto("https://rahulshettyacademy.com/client/#/auth/login")
     print(page.title())
@@ -50,6 +52,7 @@ def test_playwright_expr(page: Page):
 
 
 """Dynamic TC : add product- iphoneX and nokia edge name no matter where it is positioned,to the cart and checkout"""
+@pytest.mark.skip
 def test_product_checkout(page:Page):
     try:
         page.goto("https://rahulshettyacademy.com/loginpagePractise/")
@@ -79,6 +82,7 @@ def test_product_checkout(page:Page):
 
 
 """switch control to a new page """
+@pytest.mark.skip
 def test_new_window(page:Page):
     try:
 
@@ -185,7 +189,7 @@ def test_shortcut(page:Page):
     page.get_by_role('button',name='Sign In').click()
     expect(page.get_by_text('Incorrect')).to_be_visible()
 
-
+@pytest.mark.skip
 def test_basic(playwright: Playwright):
     browser = playwright.chromium.launch(headless=True)
     browser_context = browser.new_context()

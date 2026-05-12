@@ -1,103 +1,179 @@
-## Instruction
-1. Clone the repository
-        git clone https://github.com/ashishmishraqa/tst-playwright.git
-        cd tst-playwright
-2. Create a virtual environment
-        python -m venv .venv
-3. Activate a virtual environment
-        source .venv/bin/activate (macOS/Linux (bash/zsh))
-        .venv\Scripts\Activate.ps1(Windows - PowerShell)
-        .venv\Scripts\activate.bat(Windows)
-        source .venv/Scripts/activate (git bash)
-4. Upgrade pip(recommended)
-        python -m pip install --upgrade pip
-5. Execute pip install -r requirements.txt
-6. to install all the browsers that Playwright supports 
-   playwright install
+# tst-playwright
 
+Playwright Test Automation Framework for E-commerce (eCart) application testing.
+
+## Table of Contents
+- [Setup](#setup)
+- [Project Structure](#project-structure)
+- [Test Flow](#test-flow)
+- [Running Tests](#running-tests)
+  - [Different Modes](#different-modes)
+  - [Examples](#examples)
+- [Reporting](#reporting)
+- [Best Practices](#best-practices)
+
+## Setup
+
+### Prerequisites
+- Python 3.8+
+- Git
+
+### Installation Steps
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ashishmishraqa/tst-playwright.git
+   cd tst-playwright
+   ```
+
+2. Create virtual environment:
+   ```bash
+   python -m venv .venv
+   ```
+
+3. Activate virtual environment:
+   - Windows (PowerShell): `.venv\Scripts\Activate.ps1`
+   - Windows (CMD): `.venv\Scripts\activate.bat`
+   - macOS/Linux: `source .venv/bin/activate`
+   - Git Bash: `source .venv/Scripts/activate`
+
+4. Upgrade pip and install dependencies:
+   ```bash
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+5. Install Playwright browsers:
+   ```bash
+   playwright install
+   ```
+
+### Alternative Setup
+- Use `setup_venv.sh` script (Linux/macOS):
+  ```bash
+  ./setup_venv.sh
+  ```
+- For Windows, manually follow steps 2-5 above.
+
+Prefer manual setup for better control and cross-platform compatibility. The script assumes Unix-like environment.
+
+## Project Structure
+```
+tst-playwright/
+├── ecart/
+│   ├── configs/          # Configuration files
+│   ├── pages/            # Page Object Models (POM)
+│   │   ├── base_page.py  # Base page class with common methods
+│   │   └── ...           # Specific page classes
+│   ├── test_data/        # Test data files (JSON, etc.)
+│   ├── tests/            # Test scripts
+│   │   ├── conftest.py   # Pytest fixtures and configuration
+│   │   └── ...           # Test files
+│   ├── utilities/        # Utility functions (logger, etc.)
+│   └── logs/             # Log files
+├── allure-results/       # Allure test results
+├── traces/               # Playwright traces
+├── pyproject.toml        # Project configuration (pytest settings)
+├── requirements.txt      # Python dependencies
+├── run_test.sh           # Test runner script
+├── setup_venv.sh         # Setup script
+└── README.md
+```
+
+## Test Flow
+
+1. **Initialization**: Pytest loads `conftest.py`, sets up fixtures (browser, page, test data)
+2. **Test Execution**:
+   - Browser launches (chromium/firefox/edge, headless by default)
+   - Navigate to application URL
+   - Interact with elements using POM (Page Object Model)
+   - Assertions validate expected behavior
+   - Automatic cleanup (close browser, save traces if enabled)
+3. **Reporting**: Results saved to `allure-results/`, can be served as live report
+
+### Key Components
+- **BasePage**: Common methods (click, type, wait) with explicit waits
+- **Page Objects**: Application-specific pages inherit from BasePage
+- **Fixtures**: Provide browser instances, test data, worker isolation
+- **Markers**: Categorize tests (smoke, regression, etc.)
 
 ## Running Tests
 
-To run all tests:
-    
-    bash pytest
+### Basic Commands
+- Run all tests: `pytest`
+- Run specific file: `pytest ecart/tests/test_file.py`
+- Run with marker: `pytest -m smoke`
 
-To run tests in a specific file:
+### Different Modes
 
-    bash pytest ecart/tests/test_home.py
+#### By Test Category (Markers)
+- Smoke tests: `pytest -m smoke`
+- Regression tests: `pytest -m regression`
+- Critical tests: `pytest -m critical`
+- UI tests: `pytest -m ui`
 
-To run tests with a specific marker (if configured):
-    
-    bash pytest -m "smoke"
+#### By Browser
+- Chromium (default): `pytest --app-browser chromium`
+- Firefox: `pytest --app-browser firefox`
+- Edge: `pytest --app-browser edge`
 
-To run tests in headed mode (to see the browser):
+#### Execution Mode
+- Headless (default): `pytest` (no browser UI)
+- Headed: `pytest --headed` (visible browser)
 
-    bash pytest --headed
+#### Parallel Execution
+- Auto workers: `pytest -n auto` (uses all CPU cores)
+- Specific workers: `pytest -n 4` (4 parallel processes)
 
-To run tests in a specific browser (e.g., firefox):
-    
-    bash pytest --browser firefox
+#### Tracing
+- Enable traces: `pytest --enable-trace` (saves to `traces/`)
 
-Run all tests and generate Allure results
+#### Reporting
+- Generate Allure results: `pytest --alluredir=allure-results`
+- Serve live report: `allure serve allure-results`
 
-        pytest --alluredir=allure-results
+### Examples
 
-Run specific test file
+#### Full Regression Suite
+```bash
+pytest -m regression -n auto --alluredir=allure-results
+```
 
-        pytest ecart/tests/test_home.py --alluredir=allure-results
+#### Smoke Tests in Firefox, Headed
+```bash
+pytest -m smoke --app-browser firefox --headed
+```
 
-Run with markers
+#### Single Test with Tracing
+```bash
+pytest ecart/tests/test_ui_validations.py --enable-trace
+```
 
-        pytest -m smoke --alluredir=allure-results
+#### Using Run Script
+```bash
+./run_test.sh smoke 4 false  # marker, workers, headed
+```
 
-## Project Structure
+Prefer `pytest` commands directly for flexibility. Use `run_test.sh` for quick CI/CD integration.
 
-- `ecart/configs`: Configuration files.
-- `ecart/pages`: Page Object Models (POM).
-- `ecart/test_data`: Test data files.
-- `ecart/tests`: Test scripts.
-- `ecart/utils`: Utility functions.
-- `requirements.txt`: Python dependencies.
+## Reporting
 
-## reporting flow
-        
-        Running Tests ──→ allure-results/ ──→ allure serve ──→ 📊 Live Report
-                               ↓
-                         allure generate ──→ allure-report/ ──→ 📊 Static HTML
+### Allure Reports
+- Results stored in `allure-results/`
+- Live report: `allure serve allure-results`
+- Static HTML: `allure generate allure-results -o allure-report`
 
-## Best Practices 
-1. Avoid hard code test data
-2. Externalize Test data
-3. Implement POM
-4. Centralize reusable code
-5. Define global environment variable
-6. 
+### HTML Reports
+- Generate: `pytest --html=report.html`
+- Self-contained: `pytest --html=report.html --self-contained-html`
 
+Prefer Allure for detailed, interactive reports with history and trends. HTML reports are simpler for quick checks.
 
-# Set up Playwright MCP
-
-install Claude code 
-
-
-# Parallel Execution
-┌─────────────────────────────────────────────────────┐
-│              MASTER PROCESS (Controller)            │
-│  • Discovers tests                                  │
-│  • Distributes to workers                           │
-│  • Collects results                                 │
-└──────────┬────────────┬────────────┬────────────────┘
-           │            │            │
-    ┌──────▼─────┐ ┌───▼──────┐ ┌──▼─────────┐
-    │  WORKER 0  │ │ WORKER 1 │ │ WORKER 2   │
-    │ Browser 1  │ │Browser 2 │ │ Browser 3  │
-    │ Context A  │ │Context B │ │ Context C  │
-    │ Port 9001  │ │Port 9002 │ │ Port 9003  │
-    └────────────┘ └──────────┘ └────────────┘
-         ▲              ▲             ▲
-         │              │             │
-    Isolated      Isolated       Isolated
-    Test Data     Test Data      Test Data
-
-
-                
-        
+## Best Practices
+- Avoid hardcoded test data; use external files
+- Implement Page Object Model for maintainability
+- Centralize reusable code in utilities
+- Define environment variables for config
+- Use explicit waits instead of sleep
+- Enable tracing for debugging failures
+- Run tests in parallel for speed
+- Categorize tests with markers

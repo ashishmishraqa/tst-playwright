@@ -95,12 +95,3 @@ jobs:
               repo: context.repo.repo,
               body: `✅ Tests completed for ${{ matrix.test-suite }} suite`
             });
-
-      - name: Generate Allure Report
-        run: allure generate allure-results -o allure-report --clean
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./allure-report

@@ -9,7 +9,7 @@ description = "Playwright Test Automation Framework"
 
 [tool.pytest.ini_options]
 # Parallel execution
-addopts = "-n auto --dist loadscope -v --tb=short --alluredir=allure-results"
+addopts = "-n 1 --dist loadscope -v --tb=short --alluredir=allure-results"
 #addopts = [
 #    "--html=report.html",
 #    "--self-contained-html",

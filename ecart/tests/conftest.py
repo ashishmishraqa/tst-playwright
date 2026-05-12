@@ -58,16 +58,3 @@ def fetch_test_data():
         test_data = json.load(f)
         # self.log.info('test data has been fetched')
         return test_data['user_credentials']
-
-
-@pytest.fixture(scope="session")
-def conf_work():
-    print('now we are under conftest')
-    return 'ashish'
-
-
-@pytest.fixture(scope="session")
-def second_work():
-    print('second_work')
-    yield
-    print('printing after the all test case are executed')
