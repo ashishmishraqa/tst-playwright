@@ -43,6 +43,9 @@ jobs:
       - name: Install Playwright browsers
         run: playwright install --with-deps
 
+      - name: Clean up IDLE configuration
+        run: rm -rf ~/.idlerc
+
 
       - name: Install Allure CLI
         run: |
