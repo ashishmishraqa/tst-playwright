@@ -2,6 +2,7 @@ import json
 import pytest
 from playwright.sync_api import sync_playwright
 from utilities.logger import get_logger
+import pathlib
 
 
 log = get_logger(__name__)
@@ -54,7 +55,8 @@ def page(request):
 
 @pytest.fixture()
 def fetch_test_data():
-    with open('ecart/test_data/credentials.json') as f:
+    data_path = pathlib.Path(__file__).parent.parent / 'test_data' / 'credentials.json'
+    with open(data_path) as f:
         test_data = json.load(f)
         # self.log.info('test data has been fetched')
         return test_data['user_credentials']
