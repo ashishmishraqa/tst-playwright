@@ -13,6 +13,24 @@ class APIUtils:
         assert login_response.ok
         return login_response.json()['token']
 
+    def login_via_api(self, page):
+        # Use the same request context as the page
+        api_request = page.request
+        user_payload = {'email': "allenamy@example.net", 'password': "ioY=^Y2(@0:Y"}
+
+        login_response = api_request.post(
+            'https://naveenautomationlabs.com/opencart/index.php?route=account/login',
+            data=user_payload
+        )
+
+        assert login_response.ok
+        # print(login_response.jsonn())
+
+        # # Playwright automatically handles cookies if you use page.request
+        # # or you can explicitly capture and set them:
+        cookies = page.context.cookies()
+        return cookies
+
 
 
     def create_order(self, playwright: Playwright):

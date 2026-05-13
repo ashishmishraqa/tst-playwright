@@ -1,9 +1,10 @@
 import pytest
 from playwright.sync_api import expect
-
 from configs.config import TestData
+from pages.auth.home_page import HomePage
 from pages.auth.login_page import LoginPage
 from tests.test_base import BaseTest
+from utilities.api_utils import APIUtils
 
 
 class TestLogin(BaseTest):
@@ -68,3 +69,18 @@ class TestLogin(BaseTest):
             # If no logout, perhaps navigate to home
             page.goto(TestData.BASE_URL)
             expect(page).to_have_title("Your Store")
+
+    def test_fake_login(self, page):
+        # 1. Generate Login token via API (Automatically attaches cookies to 'page')
+        api_utils = APIUtils()
+        api_utils.login_via_api(page)
+
+        # 2. Navigate to the account page (Now authenticated)
+        # Ensure you navigate to an account-restricted page, not just the login page
+        page.goto('https://naveenautomationlabs.com/opencart/index.php?route=account/login')
+        print(page.title())
+
+        # 3. Verify login success using Playwright's expect
+        # Checking for a unique element that only appears when logged in (like "Logout" or "My Account" title)
+        expect(page).to_have_title("My Account")
+        # expect(page.get_by_role("link", name="Logout")).to_be_visible()

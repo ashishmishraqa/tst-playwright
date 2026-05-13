@@ -54,4 +54,4 @@ class RegisterPage(BasePage):
       self.agree_checkbox.click()
       self.continue_button.click()
       
-      self.log.info(f"User registered successfully with email: {email}")
+      self.log.info(f"User registered successfully with email: {email} & {password}")
