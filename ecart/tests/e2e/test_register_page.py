@@ -11,15 +11,13 @@ from configs.config import TestData
 
 class TestRegisterPage(BaseTest):
 
-    log = get_logger(__name__)
-
     @pytest.mark.smoke
     def test_verify_title(self,page):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
-        expect(page).to_have_title("Your Store")
+        expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
         home.click_register()
-        expect(page).to_have_title("Register Account")
+        expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
 
 
     @pytest.mark.smoke

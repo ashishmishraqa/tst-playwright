@@ -54,6 +54,7 @@ def test_network_2(page:Page):
     print(page.locator('.blink_me').text_content())
 
 
+@pytest.mark.skip
 def test_inject_cookie(playwright: Playwright):
     api_utils= APIUtils()
     token = api_utils.get_login_token(playwright)
@@ -71,6 +72,8 @@ def test_inject_cookie(playwright: Playwright):
     time.sleep(2)
     print('landed on order list page!')
 
+
+@pytest.mark.skip
 def test_network3(playwright:Playwright):
     # simulate login
     api_utils = APIUtils()

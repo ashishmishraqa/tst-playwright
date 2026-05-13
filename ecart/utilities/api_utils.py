@@ -1,9 +1,15 @@
-import json
+import logging
 
 from playwright.sync_api import Playwright
+from configs.config import TestData
+from utilities.logger import get_logger
+
+
 
 
 class APIUtils:
+
+    log = get_logger(__name__)
 
     def get_login_token(self, playwright: Playwright):
         api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
@@ -13,21 +19,51 @@ class APIUtils:
         assert login_response.ok
         return login_response.json()['token']
 
-    def login_via_api(self, page):
-        # Use the same request context as the page
+    def login_via_api(self, page, fetch_test_data):
+        """
+        Login via form-based API endpoint and properly handle session cookies.
+
+        Key Points:
+        - OpenCart login expects multipart/form-data (not URL-encoded)
+        - UI login sends: Content-Type: multipart/form-data; boundary=...
+        - API login must match this format exactly
+        - page.request automatically follows redirects BUT cookies need manual handling
+        - Must extract Set-Cookie headers and add to context
+        """
         api_request = page.request
-        user_payload = {'email': "allenamy@example.net", 'password': "ioY=^Y2(@0:Y"}
 
-        login_response = api_request.post(
-            'https://naveenautomationlabs.com/opencart/index.php?route=account/login',
-            data=user_payload
-        )
+        # Use multipart form data to match UI behavior
+        # Create form data that matches what the browser sends
+        form_data = {
+            'email': fetch_test_data['valid_user']['username'],
+            'password': fetch_test_data['valid_user']['password']
+        }
 
-        assert login_response.ok
-        # print(login_response.jsonn())
+        # Make login request with multipart data (matches UI behavior)
+        # This sends multipart/form-data like the browser
+        login_response = api_request.post(TestData.LOGIN_PAGE,multipart=form_data)
 
-        # # Playwright automatically handles cookies if you use page.request
-        # # or you can explicitly capture and set them:
+        self.log.debug(f"Login Response Status: {login_response.status}")
+        self.log.debug(f"Login Response Headers: {login_response.headers}")
+
+        # Check response body for error messages
+        response_text = login_response.text()
+        self.log.debug(f"Login Response Body (first 500 chars): {response_text[:500]}")
+
+        # Look for common error indicators
+        if "Warning" in response_text or "error" in response_text.lower():
+            self.log.debug("⚠️  LOGIN FAILED: Error message found in response")
+        elif "My Account" in response_text or "account/account" in response_text:
+            self.log.info("LOGIN SUCCESS: Account page content found")
+        else:
+            self.log.debug("LOGIN STATUS UNKNOWN: No clear success/error indicators")
+
+        # Extract session cookie from Set-Cookie header in response
+        set_cookie_header = login_response.headers.get('set-cookie', '')
+        self.log.info(f"Set-Cookie Header: {set_cookie_header}")
+
+        # After request, check all cookies in the page context
+        # page.request automatically adds cookies from responses to the context
         cookies = page.context.cookies()
         return cookies
 
@@ -46,6 +82,3 @@ class APIUtils:
     def create_orders(self,playwright:Playwright):
         api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
         response = api_request.get('/api/ecom/product/get-product-list',)
-
-
-

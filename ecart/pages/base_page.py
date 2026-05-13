@@ -36,7 +36,7 @@ class BasePage:
     # ---------------------------
     def go_to(self, url: str):
         self.log.info(f"Navigating to URL: {url}")
-        self.page.goto(url,timeout=self.NAVIGATION_TIMEOUT, wait_until='networkidle')
+        self.page.goto(url,timeout=60000, wait_until='domcontentloaded')
 
     def reload(self) -> None:
         self.page.reload(wait_until="networkidle", timeout=self.NAVIGATION_TIMEOUT)

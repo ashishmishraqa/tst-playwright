@@ -1,7 +1,6 @@
 import pytest
 from playwright.sync_api import expect
 from configs.config import TestData
-from pages.auth.home_page import HomePage
 from pages.auth.login_page import LoginPage
 from tests.test_base import BaseTest
 from utilities.api_utils import APIUtils
@@ -59,28 +58,40 @@ class TestLogin(BaseTest):
         # Login first
         creds = fetch_test_data['valid_user']
         login_page.login(creds['username'], creds['password'])
+        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)  # Verify login success
 
         # If login successful, look for logout
-        logout_link = page.locator('a').filter(has_text='Logout')
-        if logout_link.count() > 0:
-            logout_link.click()
-            expect(page).to_have_url(TestData.LOGOUT_PAGE)
-        else:
-            # If no logout, perhaps navigate to home
-            page.goto(TestData.BASE_URL)
-            expect(page).to_have_title("Your Store")
+        login_page.logout()
+        expect(page).to_have_url(TestData.LOGOUT_PAGE)
 
-    def test_fake_login(self, page):
-        # 1. Generate Login token via API (Automatically attaches cookies to 'page')
+
+
+    @pytest.mark.smoke
+    def test_fake_login(self, page, fetch_test_data):
+        """
+        Test login via API - Hybrid approach.
+
+        Why this works:
+        - Network tab shows: POST returns 302 redirect + Set-Cookie (OCSESSID)
+        - page.request uses same context as page
+        - Cookies from 302 response automatically added to page.context
+        - After login, navigate to authenticated page with valid session
+
+        Key learnings:
+        - 302 != failure, it's success with redirect
+        - Form-based login sets cookies in response headers
+        - page.request auto-handles cookies for page context
+        - Must ensure page.context has cookies before navigation
+        """
         api_utils = APIUtils()
-        api_utils.login_via_api(page)
 
-        # 2. Navigate to the account page (Now authenticated)
-        # Ensure you navigate to an account-restricted page, not just the login page
-        page.goto('https://naveenautomationlabs.com/opencart/index.php?route=account/login')
-        print(page.title())
+        # 1. Login via API (POST to form endpoint)
+        # This returns 302 + OCSESSID cookie
+        api_utils.login_via_api(page,fetch_test_data)
+        # print(f"[DEBUG] Login complete. Cookies: {cookies}")
 
-        # 3. Verify login success using Playwright's expect
-        # Checking for a unique element that only appears when logged in (like "Logout" or "My Account" title)
-        expect(page).to_have_title("My Account")
-        # expect(page.get_by_role("link", name="Logout")).to_be_visible()
+        # 2. Navigate to account page (uses cookies from page.context)
+        page.goto(TestData.USER_LOGGED_IN_PAGE, wait_until='domcontentloaded')
+
+        # 3. Verify login success
+        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
