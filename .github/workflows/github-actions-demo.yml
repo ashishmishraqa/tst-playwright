@@ -56,6 +56,8 @@ jobs:
             sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
 
       - name: Run ${{ matrix.test-suite }} tests
+        env:
+          PYTEST_ADDOPTS: "-n auto --dist loadscope --alluredir=allure-results"
         run: |
           # Use the worker mode specified in the workflow dispatch input, or default to 'auto'
           WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
