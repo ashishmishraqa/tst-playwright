@@ -16,6 +16,12 @@ on:
         options:
           - auto
           - 1
+# Required permissions for secure AWS authentication via OIDC
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   test:
@@ -55,6 +61,20 @@ jobs:
             tar -zxvf allure-2.27.0.tgz -C /opt/
             sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
 
+      - name: Configure AWS Credentials
+        if: always()
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1 # Change to your AWS region if different
+
+      # Downloads the 'history' directory from your past execution to maintain trends
+      - name: Fetch Past Allure History
+        if: always()
+        run: |
+          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/history/ ./allure-results/history/ --recursive || true
+
+
       - name: Run ${{ matrix.test-suite }} tests
         env:
           PYTEST_ADDOPTS: "-n auto --dist loadscope --alluredir=allure-results"
@@ -73,6 +93,19 @@ jobs:
         run: allure generate allure-results -o allure-report --clean
 
       - name: Upload Allure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ matrix.test-suite }}-py${{ matrix.python-version }}
+          path: allure-report/
+
+            # Upload the static directory contents directly into the website S3 bucket path
+      - name: Deploy Allure Report to S3 Website
+        if: always()
+        run: |
+          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/ --delete
+
+      - name: Upload Allure Report Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
