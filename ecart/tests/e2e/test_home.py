@@ -13,6 +13,9 @@ class TestHome(BaseTest):
 
     @pytest.mark.smoke
     def test_verify_title(self, page):
+        """
+        Verify: Verify the title of the home page
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         self.log.info(f"Page title: {home.get_home_title()}")
@@ -20,6 +23,9 @@ class TestHome(BaseTest):
 
     @pytest.mark.smoke
     def test_clicking_on_login(self, page):
+        """
+        Verify: Clicking on login button
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         login_page = home.click_login()
@@ -28,6 +34,9 @@ class TestHome(BaseTest):
 
     @pytest.mark.regression
     def test_count_all_links(self, page):
+        """
+        Verify: Count all the links present on the home page
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         links_count = home.get_all_links_count()
@@ -38,6 +47,9 @@ class TestHome(BaseTest):
 
     @pytest.mark.smoke
     def test_item_search(self, page):
+        """
+        Verify: Item search
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         product_page = home.search_item(TestData.PRODUCT)

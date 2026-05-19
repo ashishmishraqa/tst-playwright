@@ -13,6 +13,9 @@ class TestRegisterPage(BaseTest):
 
     @pytest.mark.smoke
     def test_verify_title(self,page):
+        """
+        Verify: Verify the title of the home page
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
@@ -22,6 +25,9 @@ class TestRegisterPage(BaseTest):
 
     @pytest.mark.smoke
     def test_submit_registration(self,page):
+        """
+        Submit registration page
+        """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         expect(page).to_have_title(TestData.HOME_PAGE_TITLE)

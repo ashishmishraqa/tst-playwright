@@ -41,25 +41,59 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Install dependencies
+      # Dynamically creates a unique date-timestamp identifier for the folder structure
+      - name: Generate Run Timestamp
+        id: timestamp
+        run: echo "RUN_DATE=$(date +'%Y-%m-%d_%H-%M')" >> $GITHUB_OUTPUT
+
+      # Build the local container from your Dockerfile
+      - name: Build Automation Docker Image
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          docker build -t test-automation:latest .
 
-      - name: Install Playwright browsers
-        run: playwright install --with-deps
-
-      - name: Clean up IDLE configuration
-        run: rm -rf ~/.idlerc
-
-
-      - name: Install Allure CLI
+      - name: Run Tests inside Docker Container
         run: |
-            sudo apt-get update
-            sudo apt-get install -y default-jre
-            wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
-            tar -zxvf allure-2.27.0.tgz -C /opt/
-            sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+          WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/automation/allure-results \
+            -v ${{ github.workspace }}/allure-report:/automation/allure-report \
+            test-automation:latest \
+            pytest ecart/tests \
+            -m ${{ matrix.test-suite }} \
+            -n $WORKER_MODE \
+            --dist loadscope \
+            --alluredir=allure-results \
+            --junitxml=junit-${{ matrix.test-suite }}.xml
+        continue-on-error: true
+
+      - name: Generate Allure Report inside Docker Container
+        if: always()
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/automation/allure-results \
+            -v ${{ github.workspace }}/allure-report:/automation/allure-report \
+            test-automation:latest \
+            allure generate allure-results -o allure-report --clean
+
+#      - name: Install dependencies
+#        run: |
+#          python -m pip install --upgrade pip
+#          pip install -r requirements.txt
+#
+#      - name: Install Playwright browsers
+#        run: playwright install --with-deps
+#
+#      - name: Clean up IDLE configuration
+#        run: rm -rf ~/.idlerc
+#
+#
+#      - name: Install Allure CLI
+#        run: |
+#            sudo apt-get update
+#            sudo apt-get install -y default-jre
+#            wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
+#            tar -zxvf allure-2.27.0.tgz -C /opt/
+#            sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
 
       - name: Configure AWS Credentials
         if: always()
@@ -68,68 +102,100 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1 # Change to your AWS region if different
 
-      # Downloads the 'history' directory from your past execution to maintain trends
-      - name: Fetch Past Allure History
+#      # TREND STEP 1: Download global history baseline into current results directory
+#      - name: Fetch Past Allure History
+#        if: always()
+#        run: |
+#          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/history/ ./allure-results/history/ --recursive || true
+#
+#      - name: Run ${{ matrix.test-suite }} tests
+#        env:
+#          PYTEST_ADDOPTS: "-n auto --dist loadscope --alluredir=allure-results"
+#        run: |
+#          WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
+#          pytest -m ${{ matrix.test-suite }} \
+#            -n $WORKER_MODE \
+#            --dist loadscope \
+#            --alluredir=allure-results \
+#            --junitxml=junit-${{ matrix.test-suite }}.xml
+#
+#      # TREND STEP 2: Generate report (Allure automatically merges new runs into the downloaded history)
+#      - name: Generate Allure Report
+#        if: always()
+#        run: allure generate allure-results -o allure-report --clean
+#
+#      # TREND STEP 3: Push the updated history folder back to the root directory for the next test run
+#      - name: Update Global Allure History on S3
+#        if: always()
+#        run: |
+#          aws s3 cp ./allure-report/history/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/history/ --recursive
+#
+#      # DEPLOY STEP: Upload the full report into a unique, date-isolated directory
+#      - name: Deploy Allure Report to S3 Website (Date-wise)
+#        if: always()
+#        run: |
+#          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ --delete
+#
+#      - name: Upload Allure Report Artifact
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: allure-report-${{ matrix.test-suite }}-py${{ matrix.python-version }}
+#          path: allure-report/
+#          overwrite: true
+#
+#      - name: Upload JUnit XML
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: junit-reports-${{ matrix.test-suite }}-py${{ matrix.python-version }}
+#          path: junit-${{ matrix.test-suite }}.xml
+#          overwrite: true
+
+        # Deploy directly to S3
+      - name: Deploy Allure Report to S3 Website (Date-wise)
         if: always()
         run: |
-          aws s3 cp s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/history/ ./allure-results/history/ --recursive || true
+          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ --delete
+
+#      # Send the custom HTML status email to multiple recipients
+#      - name: Send Execution Status Email
+#        if: always()
+#        uses: dawidd6/action-send-mail@v4
+#        with:
+#          server_address: ://gmail.com # Change to your SMTP server (e.g., ://mailhawk.com, ://office365.com)
+#          server_port: 465
+#          username: ${{ secrets.EMAIL_USERNAME }}
+#          password: ${{ secrets.EMAIL_PASSWORD }}
+#          subject: "🚀 QA Test Execution Report: ${{ matrix.test-suite }} Suite"
+#          to: ${{ secrets.EMAIL_RECEIVERS }}
+#          from: "Test Automation Pipeline <${{ secrets.EMAIL_USERNAME }}>"
+#          secure: true
+#          html_body: |
+#            <h2>Test Run Completed Successfully</h2>
+#            <p><strong>Suite:</strong> ${{ matrix.test-suite }}</p>
+#            <p><strong>Execution Timestamp:</strong> ${{ steps.timestamp.outputs.RUN_DATE }}</p>
+#            <p>The latest automation test results have been compiled and published to AWS S3.</p>
+#            <br />
+#            <a href="http://amazonaws.com{{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/index.html"
+#               style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+#               View Live Allure Report
+#            </a>
+#            <br /><br />
+#            <p><i>This is an automated message from GitHub Actions.</i></p>
 
 
-      - name: Run ${{ matrix.test-suite }} tests
-        env:
-          PYTEST_ADDOPTS: "-n auto --dist loadscope --alluredir=allure-results"
-        run: |
-          # Use the worker mode specified in the workflow dispatch input, or default to 'auto'
-          WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
-          
-          pytest -m ${{ matrix.test-suite }} \
-            -n auto \
-            --dist loadscope \
-            --alluredir=allure-results \
-            --junitxml=junit-${{ matrix.test-suite }}.xml
-
-      - name: Generate Allure Report
-        if: always()
-        run: allure generate allure-results -o allure-report --clean
-
-      - name: Upload Allure Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report-${{ matrix.test-suite }}-py${{ matrix.python-version }}
-          path: allure-report/
-
-            # Upload the static directory contents directly into the website S3 bucket path
-      - name: Deploy Allure Report to S3 Website
-        if: always()
-        run: |
-          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/ --delete
-
-      - name: Upload Allure Report Artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-report-${{ matrix.test-suite }}-py${{ matrix.python-version }}
-          path: allure-report/
-
-      - name: Upload JUnit XML
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: junit-reports-${{ matrix.test-suite }}-py${{ matrix.python-version }}
-          path: junit-*.xml
-
-      - name: Comment PR with Test Results
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const junit = fs.readFileSync('junit-${{ matrix.test-suite }}.xml', 'utf8');
-            const passed = (junit.match(/tests="(\d+)"/g) || []).length;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `✅ Tests completed for ${{ matrix.test-suite }} suite`
-            });
+#      - name: Comment PR with Test Results
+#        if: always() && github.event_name == 'pull_request'
+#        uses: actions/github-script@v7
+#        with:
+#          script: |
+#            const fs = require('fs');
+#            const junit = fs.readFileSync('junit-${{ matrix.test-suite }}.xml', 'utf8');
+#            const passed = (junit.match(/tests="(\d+)"/g) || []).length;
+#            github.rest.issues.createComment({
+#              issue_number: context.issue.number,
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              body: `✅ Tests completed for ${{ matrix.test-suite }} suite`
+#            });

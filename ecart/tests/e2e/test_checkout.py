@@ -14,6 +14,9 @@ class TestCheckout(BaseTest):
 
     @pytest.mark.smoke
     def test_checkout(self, page):
+        """
+        Test checkout functionality after successful login
+        """
         # launch the app
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)

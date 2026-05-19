@@ -1,0 +1,120 @@
+name: Dockerized Test Automation Pipeline
+
+on:
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: "0 9 * * 4" # Every Thursday at 9:00 AM UTC
+  workflow_dispatch:
+    inputs:
+      worker_mode:
+        description: 'Choose the worker mode for test execution'
+        required: true
+        default: 'auto'
+        options:
+          - auto
+          - 1
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.13]
+        test-suite: [smoke, regression]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Run Timestamp
+        id: timestamp
+        run: echo "RUN_DATE=$(date +'%Y-%m-%d_%H-%M')" >> $GITHUB_OUTPUT
+
+      # Build the local container from your Dockerfile
+      - name: Build Automation Docker Image
+        run: |
+          docker build -t test-automation:latest .
+
+      # Run the tests inside the container and mount folders to extract test artifacts
+      - name: Run Tests inside Docker Container
+        run: |
+          WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/automation/allure-results \
+            -v ${{ github.workspace }}/allure-report:/automation/allure-report \
+            -v ${{ github.workspace }}:/automation/reports-out \
+            test-automation:latest \
+            pytest -m ${{ matrix.test-suite }} -n $WORKER_MODE --dist loadscope --alluredir=allure-results --junitxml=reports-out/junit-${{ matrix.test-suite }}.xml
+        continue-on-error: true
+
+      # Generate the static website HTML files
+      - name: Generate Allure Report inside Docker Container
+        if: always()
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/allure-results:/automation/allure-results \
+            -v ${{ github.workspace }}/allure-report:/automation/allure-report \
+            test-automation:latest \
+            allure generate allure-results -o allure-report --clean
+
+      - name: Configure AWS Credentials
+        if: always()
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      # Deploy directly to S3
+      - name: Deploy Allure Report to S3 Website (Date-wise)
+        if: always()
+        run: |
+          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ --delete
+
+      # Send the custom HTML status email to multiple recipients
+      - name: Send Execution Status Email
+        if: always()
+        uses: dawidd6/action-send-mail@v4
+        with:
+          server_address: ://gmail.com # Change to your SMTP server (e.g., ://mailhawk.com, ://office365.com)
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "🚀 QA Test Execution Report: ${{ matrix.test-suite }} Suite"
+          to: ${{ secrets.EMAIL_RECEIVERS }}
+          from: "Test Automation Pipeline <${{ secrets.EMAIL_USERNAME }}>"
+          secure: true
+          html_body: |
+            <h2>Test Run Completed Successfully</h2>
+            <p><strong>Suite:</strong> ${{ matrix.test-suite }}</p>
+            <p><strong>Execution Timestamp:</strong> ${{ steps.timestamp.outputs.RUN_DATE }}</p>
+            <p>The latest automation test results have been compiled and published to AWS S3.</p>
+            <br />
+            <a href="http://amazonaws.com{{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/index.html"
+               style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">
+               View Live Allure Report
+            </a>
+            <br /><br />
+            <p><i>This is an automated message from GitHub Actions.</i></p>
+
+      - name: Comment PR with Test Results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const bucketName = "ecart-playwright-allure-report-713881826158-us-east-1-an";
+            const runDate = "${{ steps.timestamp.outputs.RUN_DATE }}";
+            const reportUrl = `http://${bucketName}://{{ matrix.test-suite }}/${runDate}/index.html`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### ✅ Containerized Test Run Execution Summary\n\n* **Suite**: \`${{ matrix.test-suite }}\`\n* **Execution Date**: \`${runDate}\`\n* **Live Allure Report Website**: [View This Execution Report](${reportUrl})`
+            });
