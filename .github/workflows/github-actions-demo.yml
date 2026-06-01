@@ -26,6 +26,8 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      AWS_SMOKE_SECRET_NAME: ${{ secrets.AWS_SMOKE_SECRET_NAME }}
     strategy:
       matrix:
         python-version: [3.13]
@@ -46,15 +48,39 @@ jobs:
         id: timestamp
         run: echo "RUN_DATE=$(date +'%Y-%m-%d_%H-%M')" >> $GITHUB_OUTPUT
 
+      - name: Configure AWS Credentials
+        if: always()
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1 # Change to your AWS region if different
+
       # Build the local container from your Dockerfile
       - name: Build Automation Docker Image
         run: |
           docker build -t test-automation:latest .
 
+      - name: Smoke Test AWS Secrets Manager Access
+        run: |
+          docker run --rm \
+            -e AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY \
+            -e AWS_SESSION_TOKEN \
+            -e AWS_REGION \
+            -e AWS_DEFAULT_REGION \
+            -e AWS_SMOKE_SECRET_NAME \
+            test-automation:latest \
+            python -c "import os; from ecart.utilities.secret_manager import SecretsManager; secret_name = os.environ['AWS_SMOKE_SECRET_NAME']; secrets = SecretsManager().get_secret(secret_name); print(f'Secrets Manager access verified for {secret_name}: {sorted(secrets.keys())}')"
+
       - name: Run Tests inside Docker Container
         run: |
           WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
           docker run --rm \
+            -e AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY \
+            -e AWS_SESSION_TOKEN \
+            -e AWS_REGION \
+            -e AWS_DEFAULT_REGION \
             -v ${{ github.workspace }}/allure-results:/automation/allure-results \
             -v ${{ github.workspace }}/allure-report:/automation/allure-report \
             test-automation:latest \
@@ -70,6 +96,11 @@ jobs:
         if: always()
         run: |
           docker run --rm \
+            -e AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY \
+            -e AWS_SESSION_TOKEN \
+            -e AWS_REGION \
+            -e AWS_DEFAULT_REGION \
             -v ${{ github.workspace }}/allure-results:/automation/allure-results \
             -v ${{ github.workspace }}/allure-report:/automation/allure-report \
             test-automation:latest \
@@ -94,13 +125,6 @@ jobs:
 #            wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
 #            tar -zxvf allure-2.27.0.tgz -C /opt/
 #            sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
-
-      - name: Configure AWS Credentials
-        if: always()
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1 # Change to your AWS region if different
 
 #      # TREND STEP 1: Download global history baseline into current results directory
 #      - name: Fetch Past Allure History

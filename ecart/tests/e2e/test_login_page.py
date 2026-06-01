@@ -19,8 +19,9 @@ class TestLogin(BaseTest):
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # Get valid credentials from test data
-        creds = fetch_test_data['valid_user']
-        login_page.login(creds['username'], creds['password'])
+        # creds = fetch_test_data['valid_user']
+        # login_page.login(creds['username'], creds['password'])
+        login_page.login(TestData.USERNAME, TestData.PASSWORD)
 
         # For OpenCart, successful login may show account page or logout link
         # Successful login

@@ -1,7 +1,7 @@
 """
 This page stores all configurations and test data
 """
-
+from utilities.secret_manager import SecretsManager
 
 class TestData:
     BASE_URL = 'https://naveenautomationlabs.com/opencart/'
@@ -22,6 +22,14 @@ class TestData:
     CART_TOTAL_1_ITEM = '1 item(s) - $602.00'
     ITEMS_CAROUSEL = ('Harley Davidson','Dell','Disney','Starbucks','Nintendo','NFL','RedBull','Sony','Coca Cola','Burger King','Canon')
     PRODUCT = "macbook"
+
+    secrets = SecretsManager().get_secret(
+        "valid_user"
+    )
+
+    USERNAME = secrets["username"]
+    PASSWORD = secrets["password"]
+
 
 
 
