@@ -1,6 +1,4 @@
 import pytest
-
-from pages.product import product_page
 from tests.test_base import BaseTest
 from pages.auth.home_page import HomePage
 from configs.config import TestData

@@ -28,6 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AWS_SMOKE_SECRET_NAME: ${{ secrets.AWS_SMOKE_SECRET_NAME }}
+      BASE_URL: ${{ secrets.BASE_URL }}
+      BASE_URL_API: ${{ secrets.BASE_URL_API }}
     strategy:
       matrix:
         python-version: [3.13]

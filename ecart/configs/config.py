@@ -2,6 +2,10 @@
 This page stores all configurations and test data
 """
 from utilities.secret_manager import SecretsManager
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class TestData:
     BASE_URL = 'https://naveenautomationlabs.com/opencart/'
@@ -29,6 +33,12 @@ class TestData:
 
     USERNAME = secrets["username"]
     PASSWORD = secrets["password"]
+
+
+    # go rest related information
+    GO_REST_TOKEN = "Bearer 1fc7a9600574fdad7ea52e876b79ef83815dec12887fa380ed7d18796c8154b5"
+    BASE_URL_API = os.getenv("BASE_URL_API")
+    PATH_SCHEMA = '../ecart/configs/schema.json'
 
 
 

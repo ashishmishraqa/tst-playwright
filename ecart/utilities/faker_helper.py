@@ -76,6 +76,14 @@ class FakerDataGenerator:
         }
 
 
+    def generate_go_rest_post_body(self):
+        return {
+            "name":self.fake.name(),
+            "email": self.fake.email(),
+            "gender": "male",
+            "status": "active"
+        }
+
 # Singleton instance for simple usage
 _faker_instance = None
 
