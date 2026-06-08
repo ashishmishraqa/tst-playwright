@@ -1,9 +1,7 @@
 import time
-from idlelib import browser
 
 import pytest
 from playwright.sync_api import Page, expect, Playwright
-from pytest_playwright.pytest_playwright import browser_context_args
 
 
 # Note: by default, playwright will launch in headless mode

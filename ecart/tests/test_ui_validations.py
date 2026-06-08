@@ -1,6 +1,4 @@
 import time
-from os import name
-
 import pytest
 from playwright.sync_api import Page, expect
 

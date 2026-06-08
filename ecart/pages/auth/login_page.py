@@ -31,7 +31,7 @@ class LoginPage(BasePage):
         return self  # Return self or the next page if needed
 
     def logout(self):
-        self.log.info(f"Logging out")
+        self.log.info("Logging out")
         self.LOGOUT_BUTTON.click()
 
     def get_error_message(self):

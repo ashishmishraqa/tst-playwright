@@ -1,7 +1,7 @@
 import time
 import pytest
 from playwright.sync_api import expect
-from configs.config import TestData
+from configs.settings import TestData
 from pages.auth.home_page import HomePage
 from tests.test_base import BaseTest
 from utilities.logger import get_logger

@@ -4,6 +4,7 @@ from playwright.sync_api import sync_playwright
 from utilities.logger import get_logger
 import pathlib
 
+from utilities.secret_manager import SecretsManager
 
 log = get_logger(__name__)
 
@@ -20,7 +21,7 @@ def worker_id(request):
 
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def page(request):
     browser_name = request.config.getoption("--app-browser")
     enable_trace = request.config.getoption("--enable-trace")
@@ -60,3 +61,9 @@ def fetch_test_data():
         test_data = json.load(f)
         # self.log.info('test data has been fetched')
         return test_data['user_credentials']
+
+@pytest.fixture
+def credentials():
+    return SecretsManager().get_secret(
+        "valid_user"
+    )

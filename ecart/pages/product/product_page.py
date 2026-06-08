@@ -1,6 +1,3 @@
-from pydantic.v1.utils import sequence_like
-
-import pages
 from pages.base_page import BasePage
 from utilities import logger
 
@@ -35,4 +32,4 @@ class ProductPage(BasePage):
     def click_checkout(self):
         self.CART_TOTAL.click()
         self.BUTTON_CHECKOUT.click()
-        self.log.info(f"Checkout successful")
+        self.log.info("Checkout successful")

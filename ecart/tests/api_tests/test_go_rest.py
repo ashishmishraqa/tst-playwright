@@ -1,6 +1,4 @@
-import json
-import pathlib
-from configs.config import TestData
+from configs.settings import TestData
 from tests.test_base import BaseTest
 from utilities.faker_helper import FakerDataGenerator
 from utilities.logger import get_logger

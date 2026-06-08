@@ -1,6 +1,6 @@
 import pytest
 from playwright.sync_api import expect
-from configs.config import TestData
+from configs.settings import TestData
 from pages.auth.login_page import LoginPage
 from tests.test_base import BaseTest
 from utilities.api_utils import APIUtils
@@ -10,7 +10,7 @@ class TestLogin(BaseTest):
 
 
     @pytest.mark.smoke
-    def test_login_valid_credentials(self, page, fetch_test_data):
+    def test_login_valid_credentials(self, page, credentials):
         """
         Test login with valid credentials on OpenCart.
         Verifies successful login by checking navigation to account page or presence of logout.
@@ -21,7 +21,9 @@ class TestLogin(BaseTest):
         # Get valid credentials from test data
         # creds = fetch_test_data['valid_user']
         # login_page.login(creds['username'], creds['password'])
-        login_page.login(TestData.USERNAME, TestData.PASSWORD)
+        user_name = credentials['username']
+        password = credentials['password']
+        login_page.login(user_name, password)
 
         # For OpenCart, successful login may show account page or logout link
         # Successful login

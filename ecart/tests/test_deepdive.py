@@ -1,11 +1,6 @@
 import time
-import token
-from idlelib import browser
-
 import pytest
 from playwright.sync_api import Page, expect, Playwright
-from tests.conftest import page
-from utilities import api_utils
 from utilities.api_utils import APIUtils
 
 fake_no_orders_response ={"data":[],"message":"No Orders"}

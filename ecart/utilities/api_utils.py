@@ -1,16 +1,6 @@
-import logging
-from urllib import request
-
-import pytest
-import requests
 from playwright.sync_api import Playwright
-from pytest_playwright.pytest_playwright import playwright
-
-from configs.config import TestData
-from utilities import faker_helper
+from configs.settings import TestData
 from utilities.logger import get_logger
-
-
 
 
 class APIUtils:
@@ -87,11 +77,4 @@ class APIUtils:
 
     def create_orders(self,playwright:Playwright):
         api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
-        response = api_request.get('/api/ecom/product/get-product-list',)
-
-
-
-
-
-
-
+        return api_request.get('/api/ecom/product/get-product-list',)

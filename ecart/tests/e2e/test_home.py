@@ -1,7 +1,7 @@
 import pytest
 from tests.test_base import BaseTest
 from pages.auth.home_page import HomePage
-from configs.config import TestData
+from configs.settings import TestData
 from playwright.sync_api import expect
 from utilities.logger import get_logger
 
@@ -26,7 +26,7 @@ class TestHome(BaseTest):
         """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
-        login_page = home.click_login()
+        home.click_login()
         self.log.info("my account link clicked")
         expect(page).to_have_title('Account Login')
 

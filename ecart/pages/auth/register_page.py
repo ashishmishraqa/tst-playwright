@@ -1,5 +1,3 @@
-from time import time, sleep
-
 from pages.base_page import BasePage
 from utilities.logger import get_logger
 from utilities.faker_helper import get_faker_generator
