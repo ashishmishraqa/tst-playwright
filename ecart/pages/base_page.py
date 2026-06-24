@@ -1,98 +1,84 @@
-"""
-base_page.py — Base Page Object
-Every page class inherits from this. Contains shared wait strategies,
-smart locator helpers, soft assertions, and automatic failure artifacts.
+"""Shared Playwright page-object helpers.
+
+The base page provides reusable mechanics only. It intentionally avoids
+step-level logging so higher-level page objects can describe user actions in a
+clean, readable way.
 """
 
-from playwright.sync_api import Page, Locator
+from playwright.sync_api import Locator, Page, expect
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+from self_healing import heal_locator
 from utilities.logger import get_logger
 
 
-
 class BasePage:
-    """
-        Foundation for all Page Objects.
+    """Foundation for all page objects."""
 
-        Design decisions:
-        - All waits are explicit (no time.sleep anywhere in the framework).
-        - Locators are lazy — resolved only when interacted with.
-        - Failures auto-capture screenshot + trace for Allure attachment.
-        - Soft assertion collector lets a single test report multiple failures.
-        """
-    # Default timeouts (override per-page if the app needs it)
-    DEFAULT_TIMEOUT = 10_000  # ms — element visibility / clickability
-    NAVIGATION_TIMEOUT = 30_000  # ms — full page load
-    ANIMATION_TIMEOUT = 3_000  # ms — CSS transitions / loaders
+    # Centralized defaults keep timing behavior consistent across pages.
+    DEFAULT_TIMEOUT = 10_000
+    NAVIGATION_TIMEOUT = 30_000
+    ANIMATION_TIMEOUT = 3_000
+    ELEMENT_TIMEOUT = 10_000
+    VERIFY_TIMEOUT = 5_000
 
     log = get_logger(__name__)
 
     def __init__(self, page: Page):
         self.page = page
-        # gets the name of the class (here, "BasePage" or the child class name when inherited).
 
 
-    # ---------------------------
-    # Navigation
-    # ---------------------------
+    """
+    To resolve the resolve type if it is a string or Locator
+    args: locator received the page classes
+    returns: Locator
+    """
+    def _resolve_locator(self, locator: str | Locator) -> Locator:
+        return (
+            locator
+            if isinstance(locator, Locator)
+            else self.page.locator(locator)
+        )
+
     def go_to(self, url: str):
-        self.log.info(f"Navigating to URL: {url}")
-        self.page.goto(url,timeout=60000, wait_until='domcontentloaded')
-
-    def reload(self) -> None:
-        self.page.reload(wait_until="domcontentloaded", timeout=self.NAVIGATION_TIMEOUT)
-
-    def get_current_url(self) -> str:
-        return self.page.url
+        try:
+            self.page.goto(url, timeout=self.NAVIGATION_TIMEOUT, wait_until='domcontentloaded')
+        except PlaywrightTimeoutError:
+            self.log.exception(f"Timeout while trying to navigate to %s {url}")
+            raise
 
 
-    # ---------------------------
-    # Click wrapper
-    # ---------------------------
-    def click(self, locator: str| Locator):
-        resolved_locator = self.page.locator(locator) if isinstance(locator, str) else locator
-        resolved_locator.wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
-        resolved_locator.click()
-        self.log.debug(f"Clicked on: {locator}")
+    def click_on(self, locator: str | Locator):
+        target = self._resolve_locator(locator)
+        expect(target).to_be_visible()
+        try:
+            target.click()
+        except PlaywrightTimeoutError:
+            # Self-healing only applies when we have the raw selector string;
+            # a pre-built Locator carries no recoverable selector text.
+            if not isinstance(locator, str):
+                raise
+            healed = heal_locator(self.page, action="click", failed_selector=locator)
+            if not healed:
+                raise
+            self.log.warning("Self-heal: retrying click with %r (was %r)", healed, locator)
+            healed_locator = self.page.locator(healed)
+            healed_locator.wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
+            healed_locator.click()
 
-
-
-    # ---------------------------
-    # Type wrapper
-    # ---------------------------
-    def type(self, locator: str, value: str, clear=True):
-        if clear:
-            self.log.info(f"Clearing + typing '{value}' into: {locator}")
-            self.page.locator(locator).fill(value)
-        else:
-            self.log.info(f"Typing '{value}' into: {locator}")
-            self.page.locator(locator).type(value)
-
-    # ---------------------------
-    # Read text
-    # ---------------------------
-    def get_text(self, locator: str) -> str:
-        self.log.info(f"Getting text from: {locator}")
-        return self.page.locator(locator).text_content()
-
-    # ---------------------------
-    # Waits
-    # ---------------------------
-    def wait_for_visible(self, locator: str | Locator):
-        self.log.info(f"Waiting for: {locator} to be visible")
-        return self.page.locator(locator).wait_for(state="visible")
-
-    def wait_for_clickable(self, locator: str):
-        self.log.info(f"Waiting for element to be clickable: {locator}")
-        self.page.locator(locator).wait_for(state="visible")
-
-    # ---------------------------
-    # Page Title
-    # ---------------------------
     def get_title(self):
-        return self.page.title()
+        try:
+            return self.page.title()
+        except PlaywrightTimeoutError:
+            self.log.exception("Timeout while trying to get the page title.")
+            raise
 
-    #------------------------
-    # Fill the field
-    #-------------------------
     def enter_text(self, locator: Locator, value: str):
-        locator.fill(value)
+        target = self._resolve_locator(locator)
+        expect(target).to_be_visible()
+        expect(target).to_be_editable()
+        try:
+            target.fill(value, timeout=self.DEFAULT_TIMEOUT)
+        except PlaywrightTimeoutError:
+            self.log.exception("Timeout while trying to fill the input field.")
+            raise
+        expect(target).to_have_value(value, timeout=5_000)

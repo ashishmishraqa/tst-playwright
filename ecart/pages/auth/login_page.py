@@ -9,9 +9,9 @@ class LoginPage(BasePage):
     def __init__(self, page):
         super().__init__(page)
         # Locators for OpenCart
-        self.USERNAME = page.locator('#input-email')
-        self.PASSWORD = page.locator('#input-password')
-        self.LOGIN_BUTTON = page.locator('input[value="Login"]')
+        self.USERNAME = page.get_by_role('textbox', name='E-Mail Address')
+        self.PASSWORD = page.get_by_role('textbox', name='Password')
+        self.LOGIN_BUTTON = page.get_by_role('button', name='Login')
         self.LOGOUT_BUTTON = page.locator('#column-right').get_by_role('link', name='Logout')
         self.ERROR_MESSAGE = page.locator('.alert-danger')  # Assuming error messages are in alert-danger
 
@@ -25,14 +25,14 @@ class LoginPage(BasePage):
 
     def login(self, username, password):
         self.log.info(f"Logging in with username: {username}")
-        self.USERNAME.fill(username)
-        self.PASSWORD.fill(password)
-        self.LOGIN_BUTTON.click()
+        self.enter_text(self.USERNAME, username)
+        self.enter_text(self.PASSWORD, password)
+        self.click_on(self.LOGIN_BUTTON)
         return self  # Return self or the next page if needed
 
     def logout(self):
         self.log.info("Logging out")
-        self.LOGOUT_BUTTON.click()
+        self.click_on(self.LOGOUT_BUTTON)
 
     def get_error_message(self):
         return self.ERROR_MESSAGE.text_content()

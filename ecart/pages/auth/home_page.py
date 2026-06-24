@@ -12,8 +12,9 @@ class HomePage(BasePage):
     def __init__(self, page):
         super().__init__(page)
 
-        # Locators
+        # Locators as instance attribute
         self.MY_ACCOUNT = page.get_by_title('My Account')
+        self.MY_ACCOUNT_BUTTON = page.get_by_role('link', name='My Account')
         self.LOGIN = page.get_by_role('link', name='Login')
         self.REGISTER = page.get_by_role('link', name='Register')
         self.LOGIN_HEADING = "//h2[text()='Login to your account']"
@@ -26,19 +27,19 @@ class HomePage(BasePage):
     # Actions
     # ---------------------------
     def navigate_to_home(self, url):
-        self.log.info(f"Opening home page: {url}")
+        self.log.info(f"Open home page: {url}")
         self.go_to(url)
 
     def click_login(self):
-        self.log.info("Clicking on login link")
-        self.MY_ACCOUNT.click()
-        self.LOGIN.click()
+        self.log.info("clicking on login button from home page")
+        self.click_on(self.MY_ACCOUNT)
+        self.click_on(self.LOGIN)
         return LoginPage(self.page)
 
     def click_register(self):
-        self.log.info("Clicking on register link")
-        self.MY_ACCOUNT.click()
-        self.REGISTER.click()
+        self.log.info("Open registration page from home")
+        self.click_on(self.MY_ACCOUNT)
+        self.click_on(self.REGISTER)
         return RegisterPage(self.page)
 
     # ---------------------------
@@ -54,17 +55,14 @@ class HomePage(BasePage):
         return self.page.locator(self.WEBSITE_HEADING)
 
     def get_all_links(self):
-        self.log.info("Getting all links on the page")
         return self.page.locator(self.ALL_LINKS)
 
     def get_all_links_count(self):
         count = self.get_all_links().count()
-        self.log.info(f"Total links found on home page: {count}")
         return count
 
     def search_item(self, search_item):
-        self.log.info("Searching item")
+        self.log.info(f"Search for product: {search_item}")
         self.SEARCH.fill(search_item)
-        self.log.info("Searching item entered in the field")
-        self.click(self.SEARCH_BUTTON)
+        self.click_on(self.SEARCH_BUTTON)
         return ProductPage(self.page)

@@ -2,16 +2,21 @@
 This page stores all configurations and test data
 """
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+
+"""
+to load .env file irrespective of the method its invoke
+"""
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+load_dotenv(PROJECT_ROOT / ".env")
 
 class TestData:
     BASE_URL = 'https://naveenautomationlabs.com/opencart/'
     LOGIN_PAGE = 'https://naveenautomationlabs.com/opencart/index.php?route=account/login'
     LOGOUT_PAGE = 'https://naveenautomationlabs.com/opencart/index.php?route=account/logout'
     USER_LOGGED_IN_PAGE = 'https://naveenautomationlabs.com/opencart/index.php?route=account/account'
-    # PRACTICE_PAGE = 'https://automationexercise.com/'
     HOME_PAGE_TITLE = 'Your Store'
     REGISTER_PAGE_URL= 'https://naveenautomationlabs.com/opencart/index.php?route=account/register'
     REGISTER_PAGE_TITLE ='Register Account'
@@ -26,21 +31,6 @@ class TestData:
     ITEMS_CAROUSEL = ('Harley Davidson','Dell','Disney','Starbucks','Nintendo','NFL','RedBull','Sony','Coca Cola','Burger King','Canon')
     PRODUCT = "macbook"
 
-    # secrets = SecretsManager().get_secret(
-    #     "valid_user"
-    # )
-
-    # USERNAME = secrets["username"]
-    # PASSWORD = secrets["password"]
-
-
     # go rest related information
     GO_REST_TOKEN = os.getenv("GO_REST_TOKEN")
     BASE_URL_API = os.getenv("BASE_URL_API")
-    PATH_SCHEMA = '../ecart/configs/schema.json'
-
-
-
-
-# april.lastname@test.com
-# Test@12345

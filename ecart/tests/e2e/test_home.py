@@ -51,5 +51,8 @@ class TestHome(BaseTest):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         product_page = home.search_item(TestData.PRODUCT)
-        self.log.info(f"product_page title: {product_page.get_product_title()}")
+        if product_page:
+            self.log.info(f"product_page title: {product_page.get_product_title()}")
+        else:
+            raise AssertionError("Product title not found on the search results page")
         expect(page).to_have_title('Search - macbook')

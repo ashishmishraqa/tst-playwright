@@ -10,3 +10,5 @@ allure-report/
 traces/
 .allure/
 !ecart/test_data/*.json
+.env
+ecart/reports/

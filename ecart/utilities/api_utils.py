@@ -15,7 +15,7 @@ class APIUtils:
         assert login_response.ok
         return login_response.json()['token']
 
-    def login_via_api(self, page, fetch_test_data):
+    def login_via_api(self, page, credentials):
         """
         Login via form-based API endpoint and properly handle session cookies.
 
@@ -31,8 +31,8 @@ class APIUtils:
         # Use multipart form data to match UI behavior
         # Create form data that matches what the browser sends
         form_data = {
-            'email': fetch_test_data['valid_user']['username'],
-            'password': fetch_test_data['valid_user']['password']
+            'email': credentials['username'],
+            'password': credentials['password']
         }
 
         # Make login request with multipart data (matches UI behavior)
@@ -70,9 +70,8 @@ class APIUtils:
         api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
         response = api_request.get('/api/ecom/product/get-product-detail/68a961459320a140fe1ca57a',
                                     headers={'Authorization':token})
-        print(response.status)
         assert response.ok
-        print(f'product found successfully is : {response.json()['data']['productName']}')
+        self.log.info(f'product found successfully is : {response.json()['data']['productName']}')
 
 
     def create_orders(self,playwright:Playwright):

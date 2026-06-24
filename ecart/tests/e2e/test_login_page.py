@@ -17,20 +17,14 @@ class TestLogin(BaseTest):
         """
         login_page = LoginPage(page)
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
-
-        # Get valid credentials from test data
-        # creds = fetch_test_data['valid_user']
-        # login_page.login(creds['username'], creds['password'])
-        user_name = credentials['username']
-        password = credentials['password']
-        login_page.login(user_name, password)
+        login_page.login(credentials['username'], credentials['password'])
 
         # For OpenCart, successful login may show account page or logout link
         # Successful login
-        expect(page).to_have_title("My Account")  # Assuming title changes
+        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)  # Assuming title changes
 
 
-    @pytest.mark.regression
+    @pytest.mark.smoke
     def test_login_invalid_credentials(self, page, fetch_test_data):
         """
         Test login with invalid credentials on OpenCart.
@@ -50,7 +44,7 @@ class TestLogin(BaseTest):
 
 
     @pytest.mark.smoke
-    def test_logout_functionality(self, page, fetch_test_data):
+    def test_logout_functionality(self, page, credentials):
         """
         Test logout functionality after successful login on OpenCart.
         Assumes login works and logout link is available.
@@ -59,8 +53,7 @@ class TestLogin(BaseTest):
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # Login first
-        creds = fetch_test_data['valid_user']
-        login_page.login(creds['username'], creds['password'])
+        login_page.login(credentials['username'], credentials['password'])
         expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)  # Verify login success
 
         # If login successful, look for logout
@@ -70,7 +63,7 @@ class TestLogin(BaseTest):
 
 
     @pytest.mark.smoke
-    def test_fake_login(self, page, fetch_test_data):
+    def test_fake_login(self, page, credentials):
         """
         Test login via API - Hybrid approach.
 
@@ -90,7 +83,7 @@ class TestLogin(BaseTest):
 
         # 1. Login via API (POST to form endpoint)
         # This returns 302 + OCSESSID cookie
-        api_utils.login_via_api(page,fetch_test_data)
+        api_utils.login_via_api(page,credentials)
         # print(f"[DEBUG] Login complete. Cookies: {cookies}")
 
         # 2. Navigate to account page (uses cookies from page.context)

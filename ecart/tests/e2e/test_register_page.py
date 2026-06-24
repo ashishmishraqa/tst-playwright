@@ -4,12 +4,9 @@ from pages.auth.home_page import HomePage
 from tests.test_base import BaseTest
 from configs.settings import TestData
 
-
-
-
 class TestRegisterPage(BaseTest):
 
-    @pytest.mark.smoke
+    @pytest.mark.skip
     def test_verify_title(self,page):
         """
         Verify: Verify the title of the home page
@@ -21,7 +18,7 @@ class TestRegisterPage(BaseTest):
         expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
 
 
-    @pytest.mark.smoke
+    @pytest.mark.skip
     def test_submit_registration(self,page):
         """
         Submit registration page

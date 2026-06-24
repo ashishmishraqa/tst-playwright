@@ -18,6 +18,7 @@ class ProductPage(BasePage):
         return self.get_title()
 
     def add_item_to_cart(self):
+        self.log.info("Add product to cart")
         seq= 0
         for i in range(self.BUTTON_ADD_TO_CART.count()):
              if self.BUTTON_ADD_TO_CART.nth(i).get_by_role('link',name='MacBook').get_by_text("MacBook", exact=True).is_visible():
@@ -32,4 +33,4 @@ class ProductPage(BasePage):
     def click_checkout(self):
         self.CART_TOTAL.click()
         self.BUTTON_CHECKOUT.click()
-        self.log.info("Checkout successful")
+        self.log.info("Open checkout")

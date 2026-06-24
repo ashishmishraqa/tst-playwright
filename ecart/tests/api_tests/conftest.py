@@ -11,15 +11,16 @@ def auth_token():
 
 @pytest.fixture(scope="function")
 def api_auth(auth_token):
-    api_request = requests.session()
-    api_request.headers.update({'Authorization': auth_token})
-    return api_request
+    session = requests.Session()
+    session.headers.update({'Authorization': auth_token})
+    yield session
+
+    session.close()
 
 @pytest.fixture(scope="function")
 def get_schema():
     schema_path = pathlib.Path(__file__).resolve().parent.parent.parent / 'configs' / 'schema.json'
     with open(schema_path) as f:
-        schema_json = json.load(f)
-    return schema_json
+        return json.load(f)
 
 
