@@ -64,14 +64,13 @@ class APIUtils:
         return cookies
 
 
-
     def create_order(self, playwright: Playwright):
         token = self.get_login_token(playwright)
         api_request = playwright.request.new_context(base_url='https://rahulshettyacademy.com')
         response = api_request.get('/api/ecom/product/get-product-detail/68a961459320a140fe1ca57a',
                                     headers={'Authorization':token})
         assert response.ok
-        self.log.info(f'product found successfully is : {response.json()['data']['productName']}')
+        self.log.info(f"Product found successfully is : {response.json()['data']['productName']}")
 
 
     def create_orders(self,playwright:Playwright):

@@ -13,7 +13,7 @@ class HomePage(BasePage):
         super().__init__(page)
 
         # Locators as instance attribute
-        self.MY_ACCOUNT = page.get_by_title('My Account')
+        _MY_ACCOUNT = page.get_by_title('My Account')
         self.MY_ACCOUNT_BUTTON = page.get_by_role('link', name='My Account')
         self.LOGIN = page.get_by_role('link', name='Login')
         self.REGISTER = page.get_by_role('link', name='Register')

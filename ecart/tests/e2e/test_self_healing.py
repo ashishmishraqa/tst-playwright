@@ -13,8 +13,8 @@ import pytest
 
 pytest.importorskip("langgraph", reason="self-healing requires langgraph")
 
-from pages.base_page import BasePage  # noqa: E402  (after importorskip)
-from self_healing import heal_locator  # noqa: E402
+from pages.base_page import BasePage
+from self_healing import heal_locator
 
 # A tiny OpenCart-like login form. The real email field id is `input-email`.
 LOGIN_FORM_HTML = """

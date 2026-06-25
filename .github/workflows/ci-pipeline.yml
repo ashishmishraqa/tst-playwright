@@ -44,6 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          cache-dependency-path: requirements.txt
 
       # Dynamically creates a unique date-timestamp identifier for the folder structure
       - name: Generate Run Timestamp
@@ -78,11 +79,11 @@ jobs:
         run: |
           WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
           docker run --rm \
-            -e AWS_ACCESS_KEY_ID \
-            -e AWS_SECRET_ACCESS_KEY \
-            -e AWS_SESSION_TOKEN \
-            -e AWS_REGION \
-            -e AWS_DEFAULT_REGION \
+            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID\
+            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\
+            -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN\
+            -e AWS_REGION=us-east-1\
+            -e AWS_DEFAULT_REGION=us-east-1\
             -v ${{ github.workspace }}/allure-results:/automation/allure-results \
             -v ${{ github.workspace }}/allure-report:/automation/allure-report \
             test-automation:latest \
