@@ -4,7 +4,6 @@ import pytest
 import requests
 from configs.settings import TestData
 
-
 @pytest.fixture(scope="function")
 def auth_token():
     return TestData.GO_REST_TOKEN

@@ -29,7 +29,8 @@ jobs:
     env:
       AWS_SMOKE_SECRET_NAME: ${{ secrets.AWS_SMOKE_SECRET_NAME }}
       BASE_URL: ${{ secrets.BASE_URL }}
-      BASE_URL_API: ${{ secrets.BASE_URL_API }}
+      BASE_URL_API: ${{ vars.BASE_URL_API }}   # it stored in environment variables in GitHub repository settings
+      GO_REST_TOKEN: ${{ vars.GO_REST_TOKEN }} # it stored in environment variables in GitHub repository settings
     strategy:
       matrix:
         python-version: [3.13]

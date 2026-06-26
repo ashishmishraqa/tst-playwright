@@ -31,9 +31,10 @@ class TestApi(BaseTest):
 
         # act
         api_response = api_auth.post(request_url, json=payload )
-        self.log.info(f"POST request to {request_url} returned status code {api_response.json()}")
+
 
         # assert
         assert api_response.status_code == 201, f'Expected 201, received {api_response.status_code}'
+        self.log.info(f"POST request to {request_url} returned status code {api_response.json()}")
         validate(instance=api_response.json(), schema=get_schema)
         pytestconfig.cache.set("id", api_response.json()['id'])
