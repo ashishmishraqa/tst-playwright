@@ -24,10 +24,11 @@ class TestData:
     ACCOUNT_PAGE_TITLE = 'My Account'
     SUCCESS_REGISTRATION = 'Your Account Has Been Created!'
 
+
     EXCEL_SHEET = 'data.xlsx'
     SHEET_NAME = 'registration'
     TEXT_EMPTY_CART = '0 item(s) - $0.00'
-    CART_TOTAL_1_ITEM = '1 item(s) - $602.00'
+    CART_TOTAL_MACBOOK = '1 item(s) - $602.00'
     ITEMS_CAROUSEL = ('Harley Davidson', 'Dell', 'Disney', 'Starbucks', 'Nintendo', 'NFL', 'RedBull', 'Sony',
                       'Coca Cola', 'Burger King', 'Canon')
     PRODUCT = "macbook"

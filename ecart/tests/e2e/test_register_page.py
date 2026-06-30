@@ -18,7 +18,7 @@ class TestRegisterPage(BaseTest):
         expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
 
 
-    @pytest.mark.skip
+    @pytest.mark.smoke
     def test_submit_registration(self,page):
         """
         Submit registration page

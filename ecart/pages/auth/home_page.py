@@ -63,6 +63,6 @@ class HomePage(BasePage):
 
     def search_item(self, search_item):
         self.log.info(f"Search for product: {search_item}")
-        self.SEARCH.fill(search_item)
+        self.enter_text(self.SEARCH, search_item)
         self.click_on(self.SEARCH_BUTTON)
         return ProductPage(self.page)

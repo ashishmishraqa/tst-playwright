@@ -104,7 +104,7 @@ def page(request):
     with sync_playwright() as p:
         log.info(f"Launching {browser_name} browser")
         browser_type = getattr(p, browser_name)
-        browser = browser_type.launch(headless=True)
+        browser = browser_type.launch(headless=False)
         context = browser.new_context()
 
         # Tracing is opt-in so normal runs stay fast and lightweight.
@@ -144,3 +144,13 @@ def credentials():
     return SecretsManager().get_secret(
         "valid_user"
     )
+
+
+# @pytest.fixture(autouse=True)
+# def clean_up(page):
+#     """Ensure clean state between tests."""
+#     yield
+#     # cleanups always runs even if assertion fails
+#     page.context.clear_cookies()
+#     page.evaluate('window.localstorage.clear()')
+#     page.evaluate('window.sessionStorage.clear()')

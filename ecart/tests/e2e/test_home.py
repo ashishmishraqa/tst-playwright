@@ -17,7 +17,7 @@ class TestHome(BaseTest):
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
         self.log.info(f"Page title: {home.get_home_title()}")
-        expect(page).to_have_title('Your Store')
+        expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
 
     @pytest.mark.smoke
     def test_clicking_on_login(self, page):
@@ -28,7 +28,7 @@ class TestHome(BaseTest):
         home.navigate_to_home(TestData.BASE_URL)
         home.click_login()
         self.log.info("my account link clicked")
-        expect(page).to_have_title('Account Login')
+        expect(page).to_have_title(TestData.LOGIN_PAGE_TITLE)
 
     @pytest.mark.regression
     def test_count_all_links(self, page):
@@ -43,16 +43,28 @@ class TestHome(BaseTest):
         assert links_count > 0, f"Expected links count to be greater than 0, but found {links_count}"
         self.log.info(f"Test passed: Found {links_count} links on the home page")
 
-    @pytest.mark.smoke
-    def test_item_search(self, page):
+
+
+    @pytest.mark.parametrize("products", ['macbook', 'iphone', 'canon','testing'],
+                             ids=['search products','search products','search products','Negative scenario'])
+    def test_item_search(self, page, products):
         """
-        Verify: Item search
+        Verify: Item search for multiple products
         """
         home = HomePage(page)
         home.navigate_to_home(TestData.BASE_URL)
-        product_page = home.search_item(TestData.PRODUCT)
-        if product_page:
-            self.log.info(f"product_page title: {product_page.get_product_title()}")
-        else:
-            raise AssertionError("Product title not found on the search results page")
-        expect(page).to_have_title('Search - macbook')
+
+        # search for the items
+        home.search_item(products)
+
+        # sort assertion, Use expect() with built-in retry: retries every 100ms for 30s
+        expect(page).to_have_title(f'Search - {products}')
+
+        # hard assertion, fail the test if search page is not visible
+        heading = page.get_by_role('heading', name=f'Search - {products}', level=1)
+        expect(heading).to_have_text(f'Search - {products}')
+        self.log.info(f"Search passed for {products} and title: {page.title()}")
+
+
+
+

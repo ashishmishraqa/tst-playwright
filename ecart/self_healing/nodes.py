@@ -6,9 +6,7 @@ trivial to unit-test in isolation.
 """
 
 from __future__ import annotations
-
 from typing import Any
-
 from self_healing.providers import get_proposer
 from self_healing.state import HealState
 from utilities.logger import get_logger
