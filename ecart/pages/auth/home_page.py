@@ -1,3 +1,4 @@
+from playwright.sync_api import expect
 from pages.auth.login_page import LoginPage
 from pages.base_page import BasePage
 from pages.product.product_page import ProductPage
@@ -61,8 +62,12 @@ class HomePage(BasePage):
         count = self.get_all_links().count()
         return count
 
-    def search_item(self, search_item):
-        self.log.info(f"Search for product: {search_item}")
-        self.enter_text(self.SEARCH, search_item)
+    def search_product(self, product):
+        self.log.info(f"Search for product: {product}")
+        self.enter_text(self.SEARCH, product)
         self.click_on(self.SEARCH_BUTTON)
-        return ProductPage(self.page)
+        # create the Object
+        product_page = ProductPage(self.page)
+        # validate if Product page appears
+        expect(product_page.page).to_have_title(f'Search - {product}')
+        return product_page

@@ -15,15 +15,19 @@ class TestLogin(BaseTest):
         Test login with valid credentials on OpenCart.
         Verifies successful login by checking navigation to account page or presence of logout.
         """
+        # 1. launch the login page of the app
         login_page = LoginPage(page)
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
+
+        # 2. Enter the credentials
+        print(credentials)
         login_page.login(credentials['username'], credentials['password'])
 
-        # After login attempt if any error appears: fail the test, else: assert the title of user home page
-        if login_page.is_error_visible():
-            error_text = login_page.get_error_message()
-            pytest.fail(f"Login Failed:{error_text}")
-        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)  # Assuming title changes
+        # 3. Ensure no error message is visible
+        expect(login_page.ERROR_MESSAGE, 'Error ! after entering the credentials ').not_to_be_visible()
+
+        # 4. Validate login is successful and Account page is loaded
+        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
 
 
     @pytest.mark.smoke
@@ -32,17 +36,16 @@ class TestLogin(BaseTest):
         Test login with invalid credentials on OpenCart.
         Verifies error message is displayed.
         """
+        # 1. Launch the login page
         login_page = LoginPage(page)
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
-        # Get invalid credentials from test data
+        # 2. Get invalid credentials from test data
         creds = fetch_test_data['invalid_user']
         login_page.login(creds['username'], creds['password'])
 
-        # Verify error message
-        assert login_page.is_error_visible(), "Warning: Your account has exceeded allowed number of login attempts. Please try again in 1 hour."
-        error_text = login_page.get_error_message()
-        assert "Warning" in error_text, f"Error message should contain 'Warning', got: {error_text}"
+        # 3. Verify error message
+        expect(login_page.ERROR_MESSAGE, "Warning: Your account has exceeded allowed number of login attempts. Please try again in 1 hour.").to_be_visible()
 
 
     @pytest.mark.smoke
@@ -51,20 +54,23 @@ class TestLogin(BaseTest):
         Test logout functionality after successful login on OpenCart.
         Assumes login works and logout link is available.
         """
+        # 1. Launch the login page
         login_page = LoginPage(page)
         login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
-        # Login first
+        # 2. Login with valid credentials
         login_page.login(credentials['username'], credentials['password'])
-        # Verify error message
-        if login_page.is_error_visible():
-            error_text = login_page.get_error_message()
-            pytest.fail(f"Login Failed:{error_text}")
-        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)  # Verify login success
 
-        # If login successful, look for logout
-        login_page.logout()
+        # 3. Ensure no error appears
+        expect(login_page.ERROR_MESSAGE, 'Error ! after entering the credentials ').not_to_be_visible()
+
+        # 4. Verify login success
+        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
+
+        # 5. logout & verify the logout page is displayed
+        logout_page = login_page.logout()
         expect(page).to_have_url(TestData.LOGOUT_PAGE)
+        expect(logout_page.LOGOUT_TEXT, 'Error! logout page could not be found').to_be_visible()
 
 
 

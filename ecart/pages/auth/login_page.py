@@ -1,6 +1,7 @@
+from pages.auth.logout_page import LogoutPage
 from pages.base_page import BasePage
+from pages.user.account_page import AccountPage
 from utilities.logger import get_logger
-
 
 class LoginPage(BasePage):
 
@@ -8,6 +9,7 @@ class LoginPage(BasePage):
 
     def __init__(self, page):
         super().__init__(page)
+
         # Locators for OpenCart
         self.USERNAME = page.get_by_role('textbox', name='E-Mail Address')
         self.PASSWORD = page.get_by_role('textbox', name='Password')
@@ -20,22 +22,15 @@ class LoginPage(BasePage):
         self.go_to(url)
 
 
-    def get_login_page_title(self):
-        return self.get_title()
-
     def login(self, username, password):
         self.log.info(f"Logging in with username: {username}")
         self.enter_text(self.USERNAME, username)
         self.enter_text(self.PASSWORD, password)
         self.click_on(self.LOGIN_BUTTON)
-        return self  # Return self or the next page if needed
+        return AccountPage(self.page)
 
     def logout(self):
         self.log.info("Logging out")
         self.click_on(self.LOGOUT_BUTTON)
+        return LogoutPage(self.page)
 
-    def get_error_message(self):
-        return self.ERROR_MESSAGE.text_content()
-
-    def is_error_visible(self):
-        return self.ERROR_MESSAGE.is_visible()

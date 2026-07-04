@@ -1,33 +1,22 @@
 import pytest
 from playwright.sync_api import expect
-from pages.auth.home_page import HomePage
 from tests.test_base import BaseTest
 from configs.settings import TestData
 
 class TestRegisterPage(BaseTest):
 
-    @pytest.mark.skip
-    def test_verify_title(self,page):
-        """
-        Verify: Verify the title of the home page
-        """
-        home = HomePage(page)
-        home.navigate_to_home(TestData.BASE_URL)
-        expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
-        home.click_register()
-        expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
-
 
     @pytest.mark.smoke
-    def test_submit_registration(self,page):
-        """
-        Submit registration page
-        """
-        home = HomePage(page)
-        home.navigate_to_home(TestData.BASE_URL)
+    def test_submit_registration(self, page, launch_home_page):
+        """ Test the submit registration page """
+        # 1. verify the home page appears
         expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
-        register_page = home.click_register()
+
+        # 2. click on the register button on home page & verify the page title
+        register_page = launch_home_page.click_register()
         expect(page).to_have_title(TestData.REGISTER_PAGE_TITLE)
+
+        # 3. Perform the registration & verify if registration is successful
         register_page.user_registration()
         expect(page).to_have_title(TestData.SUCCESS_REGISTRATION)
 

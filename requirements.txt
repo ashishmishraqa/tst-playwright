@@ -11,6 +11,7 @@ pytest-base-url==2.1.0
 pytest-rerunfailures==14.0  # Added for handling flaky tests
 pytest-dependency
 pytest-dotenv
+pytest-order
 
 # ==============================================================================
 # BROWSER AUTOMATION & VALIDATION

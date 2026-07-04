@@ -10,6 +10,8 @@ import os
 import pathlib
 import pytest
 from playwright.sync_api import sync_playwright
+from configs.settings import TestData
+from pages.auth.home_page import HomePage
 from utilities.logger import clear_log_context, configure_logging, get_logger, set_log_context
 from pathlib import Path
 from datetime import datetime, timezone
@@ -146,11 +148,9 @@ def credentials():
     )
 
 
-# @pytest.fixture(autouse=True)
-# def clean_up(page):
-#     """Ensure clean state between tests."""
-#     yield
-#     # cleanups always runs even if assertion fails
-#     page.context.clear_cookies()
-#     page.evaluate('window.localstorage.clear()')
-#     page.evaluate('window.sessionStorage.clear()')
+@pytest.fixture()
+def launch_home_page(page):
+    """Fixture to ensure we are on the home page before starting."""
+    home = HomePage(page)
+    home.navigate_to_home(TestData.BASE_URL)
+    return home

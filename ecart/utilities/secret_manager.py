@@ -4,9 +4,14 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 from configs.settings import TestData
+from utilities.logger import get_logger
+
+
 
 
 class SecretsManager:
+
+    log = get_logger(__name__)
 
     def __init__(self, region_name=None):
 
@@ -15,15 +20,17 @@ class SecretsManager:
         if self.is_ci:
             self.region_name = os.getenv("AWS_REGION") or "us-east-1"
             self.client = boto3.client(service_name="secretsmanager", region_name=self.region_name)
+            self.log.info("Using AWS Secrets Manager")
         else:
             self.client = None
+            self.log.info("Using local development environment, fetching secrets from environment variables")
 
     @functools.lru_cache(maxsize=None)
     def get_secret(self, secret_name):
         if not self.is_ci:
             return {
-      "username": TestData.get_env("USERNAME"),
-      "password": TestData.get_env("PASSWORD")
+                      "username": TestData.get_env("USER_NAME"),
+                      "password": TestData.get_env("PASSWORD")
     }
         try:
 
