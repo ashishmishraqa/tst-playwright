@@ -140,6 +140,7 @@ def fetch_test_data():
         test_data = json.load(f)
         return test_data['user_credentials']
 
+
 @pytest.fixture
 def credentials():
     """Return a secret-backed test user payload for auth scenarios."""

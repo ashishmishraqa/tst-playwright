@@ -24,9 +24,11 @@ class ProductPage(BasePage):
         self.log.info(f'{product} added to cart')
 
 
+
     def return_total_cart_amount(self):
-        self.log.info(f"Cart total amount: {self.CART_TOTAL.text_content()}")
-        return self.CART_TOTAL.text_content()
+        cart_total = self.CART_TOTAL.get_by_text('1 item(s)').text_content()
+        self.log.info(f"Cart total amount: {cart_total}")
+        return cart_total
 
     def click_checkout(self):
         self.click_on(self.CART_TOTAL)

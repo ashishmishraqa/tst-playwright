@@ -1,0 +1,12 @@
+{
+  "products": [
+    {
+      "product": "MacBook",
+      "expected_price": " 1 item(s) - $602.00"
+    },
+    {
+      "product": "iPhone",
+      "expected_price": " 1 item(s) - $123.20"
+    }
+  ]
+}
