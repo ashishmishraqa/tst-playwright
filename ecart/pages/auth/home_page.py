@@ -1,9 +1,10 @@
-from playwright.sync_api import expect
-from pages.auth.login_page import LoginPage
-from pages.base_page import BasePage
-from pages.product.product_page import ProductPage
-from pages.auth.register_page import RegisterPage
-from utilities.logger import get_logger
+from playwright.sync_api import expect, Locator
+from ecart.pages.auth.login_page import LoginPage
+from ecart.pages.base_page import BasePage
+from ecart.pages.product.product_page import ProductPage
+from ecart.pages.auth.register_page import RegisterPage
+from ecart.utilities.logger import get_logger
+from locators.home_page_locators import HomePageLocators
 
 
 class HomePage(BasePage):
@@ -13,61 +14,74 @@ class HomePage(BasePage):
     def __init__(self, page):
         super().__init__(page)
 
-        # Locators as instance attribute
-        self.MY_ACCOUNT = page.get_by_title('My Account')
-        self.MY_ACCOUNT_BUTTON = page.get_by_role('link', name='My Account')
-        self.LOGIN = page.get_by_role('link', name='Login')
-        self.REGISTER = page.get_by_role('link', name='Register')
-        self.LOGIN_HEADING = "//h2[text()='Login to your account']"
-        self.SEARCH = page.get_by_role('textbox', name='Search')
-        self.WEBSITE_HEADING = "img[src='/static/images/home/logo.png'][alt='Website for automation practice']"
-        self.ALL_LINKS = "a[href]"
-        self.SEARCH_BUTTON = '.fa.fa-search'
+    # ---------------------------
+    # Locators (as @property for freshness)
+    # ---------------------------
+    @property
+    def my_account_button(self) -> Locator:
+        return self.page.get_by_title(HomePageLocators.MY_ACCOUNT_LINK)
+
+    @property
+    def login_link(self) -> Locator:
+        return self.page.get_by_role('link', name=HomePageLocators.LOGIN_LINK)
+
+    @property
+    def register_link(self) -> Locator:
+        return self.page.get_by_role('link', name=HomePageLocators.REGISTER_LINK)
+
+    @property
+    def search_box(self) -> Locator:
+        return self.page.get_by_role('textbox', name=HomePageLocators.SEARCH_BOX)
+
+
+    @property
+    def search_button(self) -> Locator:
+        return self.page.locator(HomePageLocators.SEARCH_BUTTON)
+
+    @property
+    def all_links(self) -> Locator:
+        return self.page.locator(HomePageLocators.ALL_LINKS)
+
 
     # ---------------------------
-    # Actions
+    # Actions (page interactions only)
     # ---------------------------
-    def navigate_to_home(self, url):
-        self.log.info(f"Open home page: {url}")
+    def navigate_to_home(self, url: str) -> None:
+        self.log.info(f"Navigating to home page: {url}")
         self.go_to(url)
 
-    def click_login(self):
-        self.log.info("clicking on login button from home page")
-        self.click_on(self.MY_ACCOUNT)
-        self.click_on(self.LOGIN)
+    def click_login(self) -> LoginPage:
+        """Navigate to login page via dropdown."""
+        self.log.info("Navigating to login page")
+        self.click_on(self.my_account_button)
+        self.login_link.wait_for(state="visible", timeout=5000)
+        self.click_on(self.login_link)
         return LoginPage(self.page)
 
-    def click_register(self):
-        self.log.info("Open registration page from home")
-        self.click_on(self.MY_ACCOUNT)
-        self.click_on(self.REGISTER)
+    def click_register(self) -> RegisterPage:
+        """Navigate to registration page via dropdown."""
+        self.log.info("Navigating to registration page")
+        self.click_on(self.my_account_button)
+        self.register_link.wait_for(state="visible", timeout=5000)
+        self.click_on(self.register_link)
         return RegisterPage(self.page)
 
+
+    def search_product(self, product_name: str) -> ProductPage:
+        """Search for a product and return product page object."""
+        self.log.info(f"Searching for product: '{product_name}'")
+        self.enter_text(self.search_box, product_name)
+        self.click_on(self.search_button)
+        return ProductPage(self.page)
+
+
     # ---------------------------
-    # Getters
+    # Data Getters (optional—only if tests need them)
     # ---------------------------
-    def get_home_title(self):
-        return self.get_title()
-
-    def get_login_heading(self):
-        return self.page.locator(self.LOGIN_HEADING)
-
-    def get_website_heading(self):
-        return self.page.locator(self.WEBSITE_HEADING)
-
-    def get_all_links(self):
-        return self.page.locator(self.ALL_LINKS)
-
-    def get_all_links_count(self):
-        count = self.get_all_links().count()
+    def get_links_count(self) -> int:
+        """Return count of all links on homepage."""
+        count = self.all_links.count()
+        self.log.debug(f"Total links on homepage: {count}")
         return count
 
-    def search_product(self, product):
-        self.log.info(f"Search for product: {product}")
-        self.enter_text(self.SEARCH, product)
-        self.click_on(self.SEARCH_BUTTON)
-        # create the Object
-        product_page = ProductPage(self.page)
-        # validate if Product page appears
-        expect(product_page.page).to_have_title(f'Search - {product}')
-        return product_page
+

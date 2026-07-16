@@ -5,6 +5,7 @@
 *.json
 *.txt
 *.html
+*.png
 allure-results/
 allure-report/
 traces/

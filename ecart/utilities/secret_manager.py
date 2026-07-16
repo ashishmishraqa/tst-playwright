@@ -3,10 +3,8 @@ import json
 import os
 import boto3
 from botocore.exceptions import ClientError
-from configs.settings import TestData
-from utilities.logger import get_logger
-
-
+from ecart.configs.settings import TestData
+from ecart.utilities.logger import get_logger
 
 
 class SecretsManager:

@@ -1,5 +1,5 @@
-from pages.base_page import BasePage
-from utilities.logger import get_logger
+from ecart.pages.base_page import BasePage
+from ecart.utilities.logger import get_logger
 
 
 class AccountPage(BasePage):

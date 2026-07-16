@@ -4,18 +4,19 @@ Pytest configuration and framework-wide fixtures.
 This file is responsible for run-level logging setup, test-context enrichment,
 and browser/tracing lifecycle management for Playwright tests.
 """
-
 import json
 import os
 import pathlib
 import pytest
 from playwright.sync_api import sync_playwright
-from configs.settings import TestData
-from pages.auth.home_page import HomePage
-from utilities.logger import clear_log_context, configure_logging, get_logger, set_log_context
+from ecart.configs.settings import TestData
+from ecart.pages.auth.home_page import HomePage
+from ecart.pages.auth.login_page import LoginPage
+from ecart.utilities.logger import clear_log_context, configure_logging, get_logger, set_log_context
 from pathlib import Path
 from datetime import datetime, timezone
-from utilities.secret_manager import SecretsManager
+from ecart.utilities.secret_manager import SecretsManager
+from utilities.user_factory import UserFactory
 
 log = get_logger(__name__)
 
@@ -135,7 +136,7 @@ def page(request):
 @pytest.fixture()
 def fetch_test_data():
     """Load test credentials from the local JSON data file."""
-    data_path = pathlib.Path(__file__).parent.parent / 'test_data' / 'credentials.json'
+    data_path = pathlib.Path(__file__).resolve().parent.parent.parent / 'test_data' / 'credentials.json'
     with open(data_path) as f:
         test_data = json.load(f)
         return test_data['user_credentials']
@@ -150,8 +151,27 @@ def credentials():
 
 
 @pytest.fixture()
-def launch_home_page(page):
+def home_page(page):
     """Fixture to ensure we are on the home page before starting."""
     home = HomePage(page)
     home.navigate_to_home(TestData.BASE_URL)
-    return home
+    yield home
+
+
+@pytest.fixture()
+def login_page(page):
+    """Fixture to ensure we are on the login page before starting."""
+    login = LoginPage(page)
+    login.navigate_to_login_page(TestData.LOGIN_PAGE)
+    yield login
+
+
+@pytest.fixture()
+def user_factory():
+    """invoke the data factory to create a user registration """
+    return UserFactory()
+
+
+@pytest.fixture()
+def valid_registration_user(user_factory):
+    return user_factory.valid_registration_user()

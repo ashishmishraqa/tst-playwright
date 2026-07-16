@@ -1,76 +1,69 @@
 import pytest
 from playwright.sync_api import expect
-from configs.settings import TestData
-from pages.auth.login_page import LoginPage
-from tests.test_base import BaseTest
-from utilities.api_utils import APIUtils
+from ecart.configs.settings import TestData
+from ecart.tests.test_base import BaseTest
+from ecart.utilities.api_utils import APIUtils
 
 
 class TestLogin(BaseTest):
 
 
     @pytest.mark.smoke
-    def test_login_valid_credentials(self, page, credentials):
+    def test_login_valid_credentials(self, login_page, credentials):
         """
         Test login with valid credentials on OpenCart.
         Verifies successful login by checking navigation to account page or presence of logout.
         """
-        # 1. launch the login page of the app
-        login_page = LoginPage(page)
-        login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
-
         # 2. Enter the credentials
-        print(credentials)
         login_page.login(credentials['username'], credentials['password'])
 
         # 3. Ensure no error message is visible
-        expect(login_page.ERROR_MESSAGE, 'Error ! after entering the credentials ').not_to_be_visible()
+        login_page.expect_no_error_message()
 
         # 4. Validate login is successful and Account page is loaded
-        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
+        expect(login_page.page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
 
 
     @pytest.mark.smoke
-    def test_login_invalid_credentials(self, page, fetch_test_data):
+    def test_login_invalid_credentials(self, login_page, fetch_test_data):
         """
         Test login with invalid credentials on OpenCart.
         Verifies error message is displayed.
         """
-        # 1. Launch the login page
-        login_page = LoginPage(page)
-        login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
+        # # 1. Launch the login page
+        # login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # 2. Get invalid credentials from test data
         creds = fetch_test_data['invalid_user']
         login_page.login(creds['username'], creds['password'])
 
         # 3. Verify error message
-        expect(login_page.ERROR_MESSAGE, "Warning: Your account has exceeded allowed number of login attempts. Please try again in 1 hour.").to_be_visible()
+        login_page.verify_lockout_error()
 
 
     @pytest.mark.smoke
-    def test_logout_functionality(self, page, credentials):
+    def test_logout_functionality(self, login_page, credentials):
         """
         Test logout functionality after successful login on OpenCart.
         Assumes login works and logout link is available.
         """
         # 1. Launch the login page
-        login_page = LoginPage(page)
-        login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
+        # # login_page = LoginPage(page)
+        # login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # 2. Login with valid credentials
         login_page.login(credentials['username'], credentials['password'])
 
         # 3. Ensure no error appears
-        expect(login_page.ERROR_MESSAGE, 'Error ! after entering the credentials ').not_to_be_visible()
+        login_page.expect_no_error_message()
 
         # 4. Verify login success
-        expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
+        expect(login_page.page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
 
         # 5. logout & verify the logout page is displayed
-        logout_page = login_page.logout()
-        expect(page).to_have_url(TestData.LOGOUT_PAGE)
-        expect(logout_page.LOGOUT_TEXT, 'Error! logout page could not be found').to_be_visible()
+        logout_page = login_page.click_on_logout()
+        expect(login_page.page).to_have_url(TestData.LOGOUT_PAGE)
+        logout_page.verify_logout_text()
 
 
 

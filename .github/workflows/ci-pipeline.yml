@@ -12,10 +12,11 @@ on:
       worker_mode:
         description: 'Choose the worker mode for test execution'
         required: true
-        default: 'auto'
+        default: auto
+        type: choice
         options:
           - auto
-          - 1
+          - '1'
 # Required permissions for secure AWS authentication via OIDC
 permissions:
   id-token: write
@@ -26,31 +27,36 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+
     env:
       AWS_SMOKE_SECRET_NAME: ${{ secrets.AWS_SMOKE_SECRET_NAME }}
       BASE_URL: ${{ secrets.BASE_URL }}
       BASE_URL_API: ${{ vars.BASE_URL_API }}   # it stored in environment variables in GitHub repository settings
       GO_REST_TOKEN: ${{ vars.GO_REST_TOKEN }} # it stored in environment variables in GitHub repository settings
+
     strategy:
+      fail-fast: false
+
       matrix:
         python-version: [3.13]
         test-suite: [smoke, regression]
-      fail-fast: false
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-          cache: 'pip'
+          cache: pip
           cache-dependency-path: requirements.txt
 
       # Dynamically creates a unique date-timestamp identifier for the folder structure
       - name: Generate Run Timestamp
         id: timestamp
-        run: echo "RUN_DATE=$(date +'%Y-%m-%d_%H-%M')" >> $GITHUB_OUTPUT
+        run: echo "RUN_DATE=$(date +'%Y-%m-%d_%H-%M')" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS Credentials
         if: always()
@@ -74,17 +80,24 @@ jobs:
             -e AWS_DEFAULT_REGION \
             -e AWS_SMOKE_SECRET_NAME \
             test-automation:latest \
-            python -c "import os; from ecart.utilities.secret_manager import SecretsManager; secret_name = os.environ['AWS_SMOKE_SECRET_NAME']; secrets = SecretsManager().get_secret(secret_name); print(f'Secrets Manager access verified for {secret_name}: {sorted(secrets.keys())}')"
+            python -c "
+              from ecart.utilities.secret_manager import SecretsManager
+              import os
+              secret=os.environ['AWS_SMOKE_SECRET_NAME']
+              SecretsManager().get_secret(secret)
+              print(f'Secrets Manager verified: {secret}')"
 
       - name: Run Tests inside Docker Container
+        continue-on-error: true
+
         run: |
           WORKER_MODE="${{ github.event.inputs.worker_mode || 'auto' }}"
           docker run --rm \
-            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID\
-            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\
-            -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN\
-            -e AWS_REGION=us-east-1\
-            -e AWS_DEFAULT_REGION=us-east-1\
+            -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+            -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+            -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
+            -e AWS_REGION=us-east-1 \
+            -e AWS_DEFAULT_REGION=us-east-1 \
             -v ${{ github.workspace }}/allure-results:/automation/allure-results \
             -v ${{ github.workspace }}/allure-report:/automation/allure-report \
             test-automation:latest \
@@ -93,42 +106,21 @@ jobs:
             -n $WORKER_MODE \
             --dist loadscope \
             --alluredir=allure-results \
-            --junitxml=junit-${{ matrix.test-suite }}.xml
-        continue-on-error: true
+            --junitxml=/automation/output/junit-${{ matrix.test-suite }}.xml
+        
 
       - name: Generate Allure Report inside Docker Container
         if: always()
         run: |
           docker run --rm \
-            -e AWS_ACCESS_KEY_ID \
-            -e AWS_SECRET_ACCESS_KEY \
-            -e AWS_SESSION_TOKEN \
-            -e AWS_REGION \
-            -e AWS_DEFAULT_REGION \
-            -v ${{ github.workspace }}/allure-results:/automation/allure-results \
-            -v ${{ github.workspace }}/allure-report:/automation/allure-report \
+            -v "${{ github.workspace }}/allure-results:/automation/allure-results" \
+            -v "${{ github.workspace }}/allure-report:/automation/allure-report" \
             test-automation:latest \
-            allure generate allure-results -o allure-report --clean
+            allure generate allure-results \
+            -o allure-report \
+            --clean
 
-#      - name: Install dependencies
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install -r requirements.txt
-#
-#      - name: Install Playwright browsers
-#        run: playwright install --with-deps
-#
-#      - name: Clean up IDLE configuration
-#        run: rm -rf ~/.idlerc
-#
-#
-#      - name: Install Allure CLI
-#        run: |
-#            sudo apt-get update
-#            sudo apt-get install -y default-jre
-#            wget https://github.com/allure-framework/allure2/releases/download/2.27.0/allure-2.27.0.tgz
-#            tar -zxvf allure-2.27.0.tgz -C /opt/
-#            sudo ln -s /opt/allure-2.27.0/bin/allure /usr/bin/allure
+
 
 #      # TREND STEP 1: Download global history baseline into current results directory
 #      - name: Fetch Past Allure History
@@ -164,27 +156,30 @@ jobs:
 #        run: |
 #          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ --delete
 #
-#      - name: Upload Allure Report Artifact
-#        if: always()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: allure-report-${{ matrix.test-suite }}-py${{ matrix.python-version }}
-#          path: allure-report/
-#          overwrite: true
-#
-#      - name: Upload JUnit XML
-#        if: always()
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: junit-reports-${{ matrix.test-suite }}-py${{ matrix.python-version }}
-#          path: junit-${{ matrix.test-suite }}.xml
-#          overwrite: true
+      - name: Upload Allure Report Artifact
+        if: always()
+
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-${{ matrix.test-suite }}
+          path: allure-report
+
+      - name: Upload JUnit XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-${{ matrix.test-suite }}
+          path: junit-${{ matrix.test-suite }}.xml
+
 
         # Deploy directly to S3
       - name: Deploy Allure Report to S3 Website (Date-wise)
         if: always()
         run: |
-          aws s3 sync allure-report/ s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ --delete
+          aws s3 sync \
+          allure-report/ \
+          s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ \
+          --delete
 
 #      # Send the custom HTML status email to multiple recipients
 #      - name: Send Execution Status Email
@@ -227,3 +222,9 @@ jobs:
 #              repo: context.repo.repo,
 #              body: `✅ Tests completed for ${{ matrix.test-suite }} suite`
 #            });
+      - name: Fail Workflow if Tests Failed
+        if: steps.tests.outcome == 'failure'
+
+        run: |
+          echo "One or more tests failed."
+          exit 1

@@ -51,7 +51,7 @@ class BasePage:
         target = self._resolve_locator(locator)
         expect(target).to_be_visible()
         try:
-            target.click()
+            target.click(timeout=self.DEFAULT_TIMEOUT, force=False)
         except PlaywrightTimeoutError:
             # Self-healing only applies when we have the raw selector string;
             # a pre-built Locator carries no recoverable selector text.
