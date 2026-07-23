@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from ecart.utilities.faker_helper import get_faker_generator
 
 

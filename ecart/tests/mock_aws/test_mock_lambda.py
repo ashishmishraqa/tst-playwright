@@ -1,7 +1,8 @@
 import os
+
 import boto3
-from moto import mock_aws
 import pytest
+from moto import mock_aws
 from tests.mock_aws.my_lambda import handler
 
 
@@ -35,13 +36,10 @@ def s3_client(aws_env):
 def test_lambda_uploads_to_s3(s3_client):
     """Verify the Lambda handler writes one object to the mocked S3 bucket."""
     handler({"key": "data.csv"}, None)
-    print('Lambda executed successfully')
+    print("Lambda executed successfully")
 
-    obj = s3_client.get_object(
-    Bucket=os.getenv("BUCKET_NAME"),
-    Key="data.csv"
-    )
+    obj = s3_client.get_object(Bucket=os.getenv("BUCKET_NAME"), Key="data.csv")
 
-    body = obj["Body"].read()    # s3 gives object not string
-    assert body == b"data", 'Error ! file is not uploaded to s3'
-    print('file uploaded successfully to s3')
+    body = obj["Body"].read()  # s3 gives object not string
+    assert body == b"data", "Error ! file is not uploaded to s3"
+    print("file uploaded successfully to s3")

@@ -1,14 +1,15 @@
 import pytest
 from playwright.sync_api import expect
-from ecart.tests.test_base import BaseTest
+
 from ecart.configs.settings import TestData
+from ecart.tests.test_base import BaseTest
+
 
 class TestRegisterPage(BaseTest):
 
-
     @pytest.mark.smoke
     def test_submit_registration(self, page, home_page, valid_registration_user):
-        """ Test the submit registration page """
+        """Test the submit registration page"""
         # 1. verify the home page appears
         expect(page).to_have_title(TestData.HOME_PAGE_TITLE)
 
@@ -19,4 +20,3 @@ class TestRegisterPage(BaseTest):
         # 3. Perform the registration & verify if registration is successful
         register_page.register_user(valid_registration_user)
         expect(page).to_have_title(TestData.SUCCESS_REGISTRATION)
-

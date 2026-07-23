@@ -66,7 +66,11 @@ class JsonFormatter(logging.Formatter):
             "process",
             "message",
         }
-        extras = {key: value for key, value in record.__dict__.items() if key not in standard_fields}
+        extras = {
+            key: value
+            for key, value in record.__dict__.items()
+            if key not in standard_fields
+        }
         if extras:
             payload.update(extras)
 
@@ -90,7 +94,9 @@ def clear_log_context() -> None:
     _log_context.set({})
 
 
-def configure_logging(run_id: str | None = None, log_dir: str | Path | None = None) -> Path:
+def configure_logging(
+    run_id: str | None = None, log_dir: str | Path | None = None
+) -> Path:
     """Configure root logging once for the current pytest run.
 
     A run-specific directory keeps logs grouped together, which makes CI
@@ -100,7 +106,9 @@ def configure_logging(run_id: str | None = None, log_dir: str | Path | None = No
     if _logging_configured:
         return Path(getattr(configure_logging, "log_file", ""))
 
-    base_dir = Path(log_dir) if log_dir else Path(__file__).resolve().parent.parent / "logs"
+    base_dir = (
+        Path(log_dir) if log_dir else Path(__file__).resolve().parent.parent / "logs"
+    )
     run_id = run_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_dir = base_dir / run_id
     run_dir.mkdir(parents=True, exist_ok=True)

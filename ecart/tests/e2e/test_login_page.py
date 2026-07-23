@@ -1,12 +1,12 @@
 import pytest
 from playwright.sync_api import expect
+
 from ecart.configs.settings import TestData
 from ecart.tests.test_base import BaseTest
 from ecart.utilities.api_utils import APIUtils
 
 
 class TestLogin(BaseTest):
-
 
     @pytest.mark.smoke
     def test_login_valid_credentials(self, login_page, credentials):
@@ -15,14 +15,13 @@ class TestLogin(BaseTest):
         Verifies successful login by checking navigation to account page or presence of logout.
         """
         # 2. Enter the credentials
-        login_page.login(credentials['username'], credentials['password'])
+        login_page.login(credentials["username"], credentials["password"])
 
         # 3. Ensure no error message is visible
         login_page.expect_no_error_message()
 
         # 4. Validate login is successful and Account page is loaded
         expect(login_page.page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)
-
 
     @pytest.mark.smoke
     def test_login_invalid_credentials(self, login_page, fetch_test_data):
@@ -34,12 +33,11 @@ class TestLogin(BaseTest):
         # login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # 2. Get invalid credentials from test data
-        creds = fetch_test_data['invalid_user']
-        login_page.login(creds['username'], creds['password'])
+        creds = fetch_test_data["invalid_user"]
+        login_page.login(creds["username"], creds["password"])
 
         # 3. Verify error message
         login_page.verify_lockout_error()
-
 
     @pytest.mark.smoke
     def test_logout_functionality(self, login_page, credentials):
@@ -52,7 +50,7 @@ class TestLogin(BaseTest):
         # login_page.navigate_to_login_page(TestData.LOGIN_PAGE)
 
         # 2. Login with valid credentials
-        login_page.login(credentials['username'], credentials['password'])
+        login_page.login(credentials["username"], credentials["password"])
 
         # 3. Ensure no error appears
         login_page.expect_no_error_message()
@@ -64,8 +62,6 @@ class TestLogin(BaseTest):
         logout_page = login_page.click_on_logout()
         expect(login_page.page).to_have_url(TestData.LOGOUT_PAGE)
         logout_page.verify_logout_text()
-
-
 
     @pytest.mark.smoke
     def test_fake_login(self, page, credentials):
@@ -88,11 +84,11 @@ class TestLogin(BaseTest):
 
         # 1. Login via API (POST to form endpoint)
         # This returns 302 + OCSESSID cookie
-        api_utils.login_via_api(page,credentials)
+        api_utils.login_via_api(page, credentials)
         # print(f"[DEBUG] Login complete. Cookies: {cookies}")
 
         # 2. Navigate to account page (uses cookies from page.context)
-        page.goto(TestData.USER_LOGGED_IN_PAGE, wait_until='domcontentloaded')
+        page.goto(TestData.USER_LOGGED_IN_PAGE, wait_until="domcontentloaded")
 
         # 3. Verify login success
         expect(page).to_have_title(TestData.ACCOUNT_PAGE_TITLE)

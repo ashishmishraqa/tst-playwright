@@ -1,7 +1,7 @@
 import pytest
-from ecart.tests.test_base import BaseTest
-from ecart.configs.settings import TestData
 from playwright.sync_api import expect
+from ecart.configs.settings import TestData
+from ecart.tests.test_base import BaseTest
 from ecart.utilities.logger import get_logger
 
 
@@ -35,13 +35,16 @@ class TestHome(BaseTest):
         # Assert that the count is greater than 0
         assert links_count > 0, (
             f"Expected home page to have links, but found {links_count}. "
-            "Page may not be fully loaded or selectors are incorrect.")
+            "Page may not be fully loaded or selectors are incorrect."
+        )
         self.log.info(f"Test passed: Found {links_count} links on the home page")
 
-
     @pytest.mark.smoke
-    @pytest.mark.parametrize("products", ['macbook', 'iphone', 'canon','testing'],
-                             ids=['search MacBook','search iPhone','search Canon','Negative scenario'])
+    @pytest.mark.parametrize(
+        "products",
+        ["macbook", "iphone", "canon", "testing"],
+        ids=["search MacBook", "search iPhone", "search Canon", "Negative scenario"],
+    )
     def test_item_search(self, home_page, products):
         """
         Verify: Item search for multiple products
@@ -55,11 +58,8 @@ class TestHome(BaseTest):
         expect(home_page.page).to_have_title(expected_title)
 
         # 3. hard assertion, fail the test if search page is not visible
-        heading = home_page.page.get_by_role('heading', name=f'Search - {products}', level=1)
-        expect(heading).to_have_text(f'Search - {products}')
+        heading = home_page.page.get_by_role(
+            "heading", name=f"Search - {products}", level=1
+        )
+        expect(heading).to_have_text(f"Search - {products}")
         self.log.info(f"✓ Search '{products}' | Title: {home_page.page.title()}")
-
-
-
-
-

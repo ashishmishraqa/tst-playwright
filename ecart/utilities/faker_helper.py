@@ -3,9 +3,10 @@ Centralized Faker utility for generating test data across all pages.
 Single source of truth for all mock data generation.
 """
 
-from faker import Faker
-import string
 import random
+import string
+
+from faker import Faker
 
 
 class FakerDataGenerator:
@@ -14,7 +15,7 @@ class FakerDataGenerator:
     Provides methods for generating consistent test data across multiple pages.
     """
 
-    def __init__(self, locale='en_US'):
+    def __init__(self, locale="en_US"):
         """
         Initialize Faker with specified locale.
 
@@ -40,7 +41,7 @@ class FakerDataGenerator:
         Generate random 10-digit phone number.
         Format: 1239876178 (numeric only)
         """
-        return self.fake.numerify(text='##########')
+        return self.fake.numerify(text="##########")
 
     def generate_password(self, length=12):
         """
@@ -52,8 +53,13 @@ class FakerDataGenerator:
         Returns:
             str: Secure password (e.g., 'Ks7@mP9xRt2Q')
         """
-        characters = string.ascii_uppercase + string.ascii_lowercase + string.digits + string.punctuation
-        password = ''.join(random.choice(characters) for _ in range(length))
+        characters = (
+            string.ascii_uppercase
+            + string.ascii_lowercase
+            + string.digits
+            + string.punctuation
+        )
+        password = "".join(random.choice(characters) for _ in range(length))
         return password
 
     def generate_user_registration_data(self):
@@ -67,27 +73,28 @@ class FakerDataGenerator:
         password = self.generate_password()
 
         return {
-            'first_name': self.generate_first_name(),
-            'last_name': self.generate_last_name(),
-            'email': self.generate_email(),
-            'phone': self.generate_phone(),
-            'password': password,
-            'confirm_password': password
+            "first_name": self.generate_first_name(),
+            "last_name": self.generate_last_name(),
+            "email": self.generate_email(),
+            "phone": self.generate_phone(),
+            "password": password,
+            "confirm_password": password,
         }
-
 
     def generate_go_rest_post_body(self):
         return {
-            "name":self.fake.name(),
+            "name": self.fake.name(),
             "email": self.fake.email(),
             "gender": "male",
-            "status": "active"
+            "status": "active",
         }
+
 
 # Singleton instance for simple usage
 _faker_instance = None
 
-def get_faker_generator(locale='en_US'):
+
+def get_faker_generator(locale="en_US"):
     """
     Get or create a singleton Faker generator instance.
 
@@ -101,4 +108,3 @@ def get_faker_generator(locale='en_US'):
     if _faker_instance is None:
         _faker_instance = FakerDataGenerator(locale)
     return _faker_instance
-

@@ -322,6 +322,10 @@ After cloning this repository, update these items before running tests:
 6. Run `playwright install` on the machine or inside the container.
 7. In CI, provide the same environment variables as pipeline secrets, or configure AWS Secrets Manager with the expected `valid_user` secret.
 8. Do not commit local artifacts such as `report.html`, `allure-results/`, `traces/`, `.pytest_cache/`, `.ruff_cache/`, `.venv/`, or local logs.
+9. After adding or modifying tests, run the following commands to ensure code quality:
+   - `make check`       # Run all checks
+   - `make quick-check` # Just format + tests (fast)
+   - `make fix`         # Auto-fix formatting issues
 
 ## Useful Commands
 

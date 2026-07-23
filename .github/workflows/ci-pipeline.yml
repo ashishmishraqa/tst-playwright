@@ -81,11 +81,11 @@ jobs:
             -e AWS_SMOKE_SECRET_NAME \
             test-automation:latest \
             python -c "
-              from ecart.utilities.secret_manager import SecretsManager
-              import os
-              secret=os.environ['AWS_SMOKE_SECRET_NAME']
-              SecretsManager().get_secret(secret)
-              print(f'Secrets Manager verified: {secret}')"
+            from ecart.utilities.secret_manager import SecretsManager
+            import os
+            secret=os.environ['AWS_SMOKE_SECRET_NAME']
+            SecretsManager().get_secret(secret)
+            print(f'Secrets Manager verified: {secret}')"
 
       - name: Run Tests inside Docker Container
         continue-on-error: true

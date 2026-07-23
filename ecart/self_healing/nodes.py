@@ -6,7 +6,9 @@ trivial to unit-test in isolation.
 """
 
 from __future__ import annotations
+
 from typing import Any
+
 from self_healing.providers import get_proposer
 from self_healing.state import HealState
 from utilities.logger import get_logger
@@ -79,7 +81,9 @@ def validate_candidates(state: HealState) -> dict[str, Any]:
             log.debug("candidate %s rejected: %s", selector, exc)
 
     note = (
-        f"validated -> {validated}" if validated else "no candidate validated this round"
+        f"validated -> {validated}"
+        if validated
+        else "no candidate validated this round"
     )
     return {
         "validated_selector": validated,

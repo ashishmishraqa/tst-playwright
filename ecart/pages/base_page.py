@@ -5,8 +5,9 @@ step-level logging so higher-level page objects can describe user actions in a
 clean, readable way.
 """
 
-from playwright.sync_api import Locator, Page, expect
+from playwright.sync_api import Locator, Page
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
+from playwright.sync_api import expect
 from self_healing import heal_locator
 from utilities.logger import get_logger
 
@@ -26,26 +27,23 @@ class BasePage:
     def __init__(self, page: Page):
         self.page = page
 
-
     """
     To resolve the resolve type if it is a string or Locator
     args: locator received the page classes
     returns: Locator
     """
+
     def _resolve_locator(self, locator: str | Locator) -> Locator:
-        return (
-            locator
-            if isinstance(locator, Locator)
-            else self.page.locator(locator)
-        )
+        return locator if isinstance(locator, Locator) else self.page.locator(locator)
 
     def go_to(self, url: str):
         try:
-            self.page.goto(url, timeout=self.NAVIGATION_TIMEOUT, wait_until='domcontentloaded')
+            self.page.goto(
+                url, timeout=self.NAVIGATION_TIMEOUT, wait_until="domcontentloaded"
+            )
         except PlaywrightTimeoutError:
             self.log.exception(f"Timeout while trying to navigate to %s {url}")
             raise
-
 
     def click_on(self, locator: str | Locator):
         target = self._resolve_locator(locator)
@@ -60,7 +58,9 @@ class BasePage:
             healed = heal_locator(self.page, action="click", failed_selector=locator)
             if not healed:
                 raise
-            self.log.warning("Self-heal: retrying click with %r (was %r)", healed, locator)
+            self.log.warning(
+                "Self-heal: retrying click with %r (was %r)", healed, locator
+            )
             healed_locator = self.page.locator(healed)
             healed_locator.wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
             healed_locator.click()
