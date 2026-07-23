@@ -131,7 +131,7 @@ The configured pytest markers are:
 - Python 3.11 recommended
 - pip
 - Playwright browser binaries
-- Git Bash, WSL, Linux, or macOS shell if using `run_test.sh`
+- Git Bash, WSL, Linux, or macOS shell if using `scripts/run_test.sh`
 - Optional: Allure CLI for serving Allure reports locally
 - Optional: Docker for container execution
 
