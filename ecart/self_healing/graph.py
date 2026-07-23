@@ -20,13 +20,8 @@ from __future__ import annotations
 from functools import lru_cache
 
 from langgraph.graph import END, START, StateGraph
-from self_healing.nodes import (
-    capture_context,
-    propose_candidates,
-    report,
-    should_retry,
-    validate_candidates,
-)
+from self_healing.nodes import (capture_context, propose_candidates, report,
+                                should_retry, validate_candidates)
 from self_healing.state import HealState
 
 

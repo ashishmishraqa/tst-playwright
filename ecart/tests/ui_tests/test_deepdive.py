@@ -1,8 +1,10 @@
 import time
+
 import pytest
-from ecart.tests.test_base import BaseTest
 from playwright.sync_api import Page, Playwright, expect
 from utilities.api_utils import APIUtils
+
+from ecart.tests.test_base import BaseTest
 
 fake_no_orders_response = {"data": [], "message": "No Orders"}
 

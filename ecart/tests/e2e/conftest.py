@@ -10,18 +10,16 @@ import os
 import pathlib
 from datetime import datetime, timezone
 from pathlib import Path
+
 import pytest
 from playwright.sync_api import sync_playwright
 from utilities.user_factory import UserFactory
+
 from ecart.configs.settings import TestData
 from ecart.pages.auth.home_page import HomePage
 from ecart.pages.auth.login_page import LoginPage
-from ecart.utilities.logger import (
-    clear_log_context,
-    configure_logging,
-    get_logger,
-    set_log_context,
-)
+from ecart.utilities.logger import (clear_log_context, configure_logging,
+                                    get_logger, set_log_context)
 from ecart.utilities.secret_manager import SecretsManager
 
 log = get_logger(__name__)

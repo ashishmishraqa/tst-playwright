@@ -1,5 +1,6 @@
 import pytest
 from playwright.sync_api import expect
+
 from ecart.configs.settings import TestData
 from ecart.tests.test_base import BaseTest
 from ecart.utilities.logger import get_logger
