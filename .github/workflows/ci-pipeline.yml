@@ -24,7 +24,26 @@ permissions:
   pull-requests: write
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Automation Docker Image (with cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: test-automation:latest
+          cache-from: type=gha                    # Load existing cache if available
+          cache-to: type=gha,mode=max             # 👈 SAVE to cache for next job
+
   test:
+    needs: build
     runs-on: ubuntu-latest
     environment: test
     timeout-minutes: 60
@@ -47,12 +66,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Load Docker Image from Cache
+        uses: docker/build-push-action@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: pip
-          cache-dependency-path: requirements.txt
+          context: .
+          push: false
+          load: true
+          tags: test-automation:latest
+          cache-from: type=gha                        # 👈 LOAD from cache (skip rebuilding)
+#          cache-to: type=gha,mode=max
 
       - name: Generate Run Timestamp
         id: timestamp
@@ -64,9 +89,21 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
-      - name: Build Automation Docker Image
-        run: |
-          docker build -t test-automation:latest .
+    # ═══════════════════════════════════════════════════════════════════════
+    # NEW: Set up Docker Layer Caching (faster rebuilds)
+    # ═══════════════════════════════════════════════════════════════════════
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Automation Docker Image (with cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: test-automation:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Smoke Test AWS Secrets Manager Access
         run: |
