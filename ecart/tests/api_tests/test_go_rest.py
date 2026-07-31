@@ -1,7 +1,7 @@
 import pytest
-from configs.settings import TestData
 from jsonschema import validate
-from tests.test_base import BaseTest
+
+from configs.settings import TestData
 from utilities.faker_helper import FakerDataGenerator
 from utilities.logger import get_logger
 

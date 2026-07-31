@@ -3,7 +3,7 @@ import os
 import boto3
 
 
-def handler(event, context):
+def handler(event):
     # s3 = boto3.client("s3")  # ✅ picks up env vars automatically
     client = boto3.client(service_name="s3")
     bucket = os.getenv("BUCKET_NAME")

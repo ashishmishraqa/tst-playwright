@@ -4,17 +4,14 @@ Pytest configuration and framework-wide fixtures.
 This file is responsible for run-level logging setup, test-context enrichment,
 and browser/tracing lifecycle management for Playwright tests.
 """
-
 import json
 import os
 import pathlib
 from datetime import datetime, timezone
 from pathlib import Path
-
 import pytest
 from playwright.sync_api import sync_playwright
-from utilities.user_factory import UserFactory
-
+from ecart.utilities.user_factory import UserFactory
 from ecart.configs.settings import TestData
 from ecart.pages.auth.home_page import HomePage
 from ecart.pages.auth.login_page import LoginPage
@@ -72,13 +69,13 @@ def pytest_runtest_setup(item):
     set_log_context(worker_id=worker_id, browser=browser_name, nodeid=item.nodeid)
 
 
-def pytest_runtest_call(item):
+def pytest_runtest_call():
     """Mark the log context as being inside the test call phase."""
     set_log_context(phase="call")
 
 
 @pytest.hookimpl(hookwrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(item):
     """Capture failures after the test call phase and attach diagnostics."""
     outcome = yield
     report = outcome.get_result()
@@ -110,7 +107,7 @@ def pytest_runtest_makereport(item, call):
         set_log_context(test_outcome="passed")
 
 
-def pytest_runtest_teardown(item, nextitem):
+def pytest_runtest_teardown():
     """Clear per-test context so the next test starts from a clean slate."""
     clear_log_context()
 

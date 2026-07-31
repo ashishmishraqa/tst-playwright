@@ -9,12 +9,10 @@ later by implementing the same ``propose`` signature and updating
 """
 
 from __future__ import annotations
-
 import os
 import re
 from typing import Any, Protocol
-
-from utilities.logger import get_logger
+from ecart.utilities.logger import get_logger
 
 log = get_logger(__name__)
 
@@ -71,7 +69,6 @@ class StubProposer:
 
     def propose(
         self,
-        action: str,
         failed_selector: str,
         elements: list[dict[str, Any]],
         max_candidates: int,

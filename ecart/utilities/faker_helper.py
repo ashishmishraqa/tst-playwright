@@ -5,7 +5,6 @@ Single source of truth for all mock data generation.
 
 import random
 import string
-
 from faker import Faker
 
 

@@ -98,6 +98,7 @@ jobs:
             -e AWS_SECRET_NAME \
             -e BASE_URL_API \
             -e GO_REST_TOKEN \
+            -e PYTHONPATH=/automation \
             -v ${{ github.workspace }}/allure-results:/automation/allure-results \
             -v ${{ github.workspace }}/allure-report:/automation/allure-report \
             -v ${{ github.workspace }}/output:/automation/output \

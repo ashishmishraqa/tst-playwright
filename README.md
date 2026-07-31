@@ -6,19 +6,19 @@ The framework covers browser workflows for the OpenCart UI, GoRest API checks, M
 
 ## Tech Stack
 
-| Area | Tools |
-| --- | --- |
-| Language | Python |
-| Browser automation | Playwright, pytest-playwright |
-| Test runner | pytest |
-| API testing | requests, jsonschema |
-| Test data | Faker, JSON fixtures, environment variables |
-| Reporting | pytest-html, Allure |
-| Parallel execution | pytest-xdist |
-| Retry handling | pytest-rerunfailures |
-| AWS mocking | moto, boto3 |
-| Self-healing locator flow | LangGraph, provider protocol |
-| Code quality | ruff |
+| Area                      | Tools                                       |
+|---------------------------|---------------------------------------------|
+| Language                  | Python                                      |
+| Browser automation        | Playwright, pytest-playwright               |
+| Test runner               | pytest                                      |
+| API testing               | requests, jsonschema                        |
+| Test data                 | Faker, JSON fixtures, environment variables |
+| Reporting                 | pytest-html, Allure                         |
+| Parallel execution        | pytest-xdist                                |
+| Retry handling            | pytest-rerunfailures                        |
+| AWS mocking               | moto, boto3                                 |
+| Self-healing locator flow | LangGraph, provider protocol                |
+| Code quality              | ruff                                        |
 
 ## Repository Structure
 
@@ -53,15 +53,15 @@ tst-playwright/
 
 The framework uses a layered test automation architecture:
 
-| Layer | Responsibility |
-| --- | --- |
-| Tests | Express user journeys and assertions with pytest |
-| Fixtures | Provide browser pages, test data, secrets, API sessions, logging context, screenshots, and traces |
-| Page objects | Encapsulate UI locators and user actions |
-| Base page | Centralizes Playwright navigation, clicks, typing, timeouts, and locator healing hooks |
-| Utilities | Handle logging, secrets, API helpers, Faker data, and reusable data operations |
-| Config | Stores URLs, titles, products, API base URL, and required environment variables |
-| Reporting | Produces HTML, Allure artifacts, screenshots, traces, and JSON logs |
+| Layer        | Responsibility                                                                                    |
+|--------------|---------------------------------------------------------------------------------------------------|
+| Tests        | Express user journeys and assertions with pytest                                                  |
+| Fixtures     | Provide browser pages, test data, secrets, API sessions, logging context, screenshots, and traces |
+| Page objects | Encapsulate UI locators and user actions                                                          |
+| Base page    | Centralizes Playwright navigation, clicks, typing, timeouts, and locator healing hooks            |
+| Utilities    | Handle logging, secrets, API helpers, Faker data, and reusable data operations                    |
+| Config       | Stores URLs, titles, products, API base URL, and required environment variables                   |
+| Reporting    | Produces HTML, Allure artifacts, screenshots, traces, and JSON logs                               |
 
 ## Design Patterns Used
 
@@ -90,17 +90,17 @@ The framework uses a layered test automation architecture:
 
 The project uses the following pytest plugins from `requirements.txt` and `pyproject.toml`:
 
-| Plugin | Purpose |
-| --- | --- |
-| `pytest-playwright` | Playwright integration for pytest-based browser automation |
-| `pytest-xdist` | Parallel test execution with `-n` workers |
+| Plugin                 | Purpose                                                        |
+|------------------------|----------------------------------------------------------------|
+| `pytest-playwright`    | Playwright integration for pytest-based browser automation     |
+| `pytest-xdist`         | Parallel test execution with `-n` workers                      |
 | `pytest-rerunfailures` | Automatic retry for failed tests; configured with `--reruns=1` |
-| `pytest-html` | Self-contained HTML report generation at `report.html` |
-| `allure-pytest` | Allure result generation with `--alluredir=allure-results` |
-| `pytest-dependency` | Test dependency ordering for API flow checks |
-| `pytest-dotenv` | Environment variable loading support |
-| `pytest-base-url` | Base URL support for browser/API configuration |
-| `pytest-asyncio` | Async test support where async pytest tests are added |
+| `pytest-html`          | Self-contained HTML report generation at `report.html`         |
+| `allure-pytest`        | Allure result generation with `--alluredir=allure-results`     |
+| `pytest-dependency`    | Test dependency ordering for API flow checks                   |
+| `pytest-dotenv`        | Environment variable loading support                           |
+| `pytest-base-url`      | Base URL support for browser/API configuration                 |
+| `pytest-asyncio`       | Async test support where async pytest tests are added          |
 
 The configured pytest markers are:
 
@@ -196,21 +196,21 @@ HEAL_PROVIDER=stub
 
 Required variables:
 
-| Variable | Used For |
-| --- | --- |
-| `BASE_URL_API` | GoRest API base URL |
-| `GO_REST_TOKEN` | GoRest API bearer token |
-| `USER_NAME` | UI login username when `AWS_SECRET_NAME` is not set |
-| `PASSWORD` | UI login password when `AWS_SECRET_NAME` is not set |
+| Variable        | Used For                                            |
+|-----------------|-----------------------------------------------------|
+| `BASE_URL_API`  | GoRest API base URL                                 |
+| `GO_REST_TOKEN` | GoRest API bearer token                             |
+| `USER_NAME`     | UI login username when `AWS_SECRET_NAME` is not set |
+| `PASSWORD`      | UI login password when `AWS_SECRET_NAME` is not set |
 
 Optional variables:
 
-| Variable | Default | Used For |
-| --- | --- | --- |
-| `SELF_HEAL` | `1` | Enables or disables locator self-healing |
-| `HEAL_PROVIDER` | `stub` | Selects the self-healing proposer implementation |
-| `AWS_SECRET_NAME` | unset | AWS Secrets Manager name/ARN for UI credentials; when set, it takes precedence over `USER_NAME` and `PASSWORD` |
-| `AWS_REGION` | `us-east-1` | AWS Secrets Manager region when `AWS_SECRET_NAME` is set |
+| Variable          | Default     | Used For                                                                                                       |
+|-------------------|-------------|----------------------------------------------------------------------------------------------------------------|
+| `SELF_HEAL`       | `1`         | Enables or disables locator self-healing                                                                       |
+| `HEAL_PROVIDER`   | `stub`      | Selects the self-healing proposer implementation                                                               |
+| `AWS_SECRET_NAME` | unset       | AWS Secrets Manager name/ARN for UI credentials; when set, it takes precedence over `USER_NAME` and `PASSWORD` |
+| `AWS_REGION`      | `us-east-1` | AWS Secrets Manager region when `AWS_SECRET_NAME` is set                                                       |
 
 ## Running Tests
 
@@ -275,12 +275,12 @@ Use the helper script:
 
 Arguments:
 
-| Position | Meaning | Example |
-| --- | --- | --- |
-| 1 | pytest marker | `smoke` |
-| 2 | xdist worker count | `4` |
-| 3 | headed mode flag | `false` |
-| 4+ | extra pytest arguments | `--lf -x` |
+| Position | Meaning                | Example   |
+|----------|------------------------|-----------|
+| 1        | pytest marker          | `smoke`   |
+| 2        | xdist worker count     | `4`       |
+| 3        | headed mode flag       | `false`   |
+| 4+       | extra pytest arguments | `--lf -x` |
 
 ## Reporting and Artifacts
 

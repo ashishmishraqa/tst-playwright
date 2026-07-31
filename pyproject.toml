@@ -17,6 +17,7 @@ addopts = [
     "--reruns-delay=1"      # Wait 1 second between retries
 ]
 testpaths = ["ecart/tests"]
+pythonpath = ["."]
 markers = [
     "smoke: Run smoke tests",
     "regression: Run regression tests",
@@ -34,3 +35,4 @@ numprocesses = "auto"
 
 [tool.allure]
 results_directory = "allure-results"
+

@@ -6,7 +6,6 @@ Run: python run_checks.py
 
 import subprocess
 import sys
-from pathlib import Path
 
 
 class Colors:
@@ -138,9 +137,9 @@ def main():
             f"{Colors.RED}❌ Some checks failed. Fix them before committing.{Colors.END}\n"
         )
         print(f"{Colors.YELLOW}Quick fixes:{Colors.END}")
-        print(f"  • Black:  python -m black .")
-        print(f"  • isort:  python -m isort .")
-        print(f"  • Tests:  python -m pytest -v --tb=short -x\n")
+        print("  • Black:  python -m black .")
+        print("  • isort:  python -m isort .")
+        print("  • Tests:  python -m pytest -v --tb=short -x\n")
         return 1
     else:
         print(
@@ -156,6 +155,7 @@ if __name__ == "__main__":
 # # 1. Auto-fix formatting
 # python -m black .
 # python -m isort .
+# ruff check .
 #
 # # 2. Check what fixed
 # python -m black --check .

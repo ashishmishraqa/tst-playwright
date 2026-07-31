@@ -37,7 +37,7 @@ def s3_client(aws_env):
 
 def test_lambda_uploads_to_s3(s3_client):
     """Verify the Lambda handler writes one object to the mocked S3 bucket."""
-    handler({"key": "data.csv"}, None)
+    handler({"key": "data.csv"})
     log.info("Lambda executed successfully")
 
     obj = s3_client.get_object(Bucket=os.getenv("BUCKET_NAME"), Key="data.csv")
