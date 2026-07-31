@@ -1,0 +1,17 @@
+# Secrets must be supplied to containers at runtime (for example, --env-file),
+# never baked into the test image.
+.env
+**/.env
+
+.git
+.idea
+.venv
+__pycache__
+.pytest_cache
+.mypy_cache
+.ruff_cache
+allure-results
+allure-report
+traces
+ecart/reports
+report.html

@@ -200,8 +200,8 @@ Required variables:
 | --- | --- |
 | `BASE_URL_API` | GoRest API base URL |
 | `GO_REST_TOKEN` | GoRest API bearer token |
-| `USER_NAME` | Local UI login username |
-| `PASSWORD` | Local UI login password |
+| `USER_NAME` | UI login username when `AWS_SECRET_NAME` is not set |
+| `PASSWORD` | UI login password when `AWS_SECRET_NAME` is not set |
 
 Optional variables:
 
@@ -209,8 +209,8 @@ Optional variables:
 | --- | --- | --- |
 | `SELF_HEAL` | `1` | Enables or disables locator self-healing |
 | `HEAL_PROVIDER` | `stub` | Selects the self-healing proposer implementation |
-| `AWS_REGION` | `us-east-1` | AWS Secrets Manager region in CI |
-| `CI` | unset | Switches secret loading from local env vars to AWS Secrets Manager |
+| `AWS_SECRET_NAME` | unset | AWS Secrets Manager name/ARN for UI credentials; when set, it takes precedence over `USER_NAME` and `PASSWORD` |
+| `AWS_REGION` | `us-east-1` | AWS Secrets Manager region when `AWS_SECRET_NAME` is set |
 
 ## Running Tests
 
@@ -320,7 +320,7 @@ After cloning this repository, update these items before running tests:
 4. If using a different API, update `BASE_URL_API`, API endpoints, payload generation, and `ecart/configs/schema.json`.
 5. Set `PYTHONPATH=ecart` when running tests from the repository root.
 6. Run `playwright install` on the machine or inside the container.
-7. In CI, provide the same environment variables as pipeline secrets, or configure AWS Secrets Manager with the expected `valid_user` secret.
+7. For an AWS-backed runner, set `AWS_SECRET_NAME` and AWS credentials/role access. Its Secrets Manager value must be JSON with `username` and `password` fields. For local, Docker, or any other CI runner, omit `AWS_SECRET_NAME` to use `USER_NAME` and `PASSWORD` from the environment.
 8. Do not commit local artifacts such as `report.html`, `allure-results/`, `traces/`, `.pytest_cache/`, `.ruff_cache/`, `.venv/`, or local logs.
 9. After adding or modifying tests, run the following commands to ensure code quality:
    - `make check`       # Run all checks

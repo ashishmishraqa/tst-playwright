@@ -1,11 +1,9 @@
 """
 This page stores all configurations and test data
 """
-
-import os
 from pathlib import Path
-
 from dotenv import load_dotenv
+from ecart.utilities.data_utils import get_env
 
 """
 to load .env file irrespective of the method its invoke
@@ -56,13 +54,6 @@ class TestData:
     """
     Fetch required environment variables and raise an error if they are not set.
     """
-
-    def get_env(name: str) -> str:
-        value = os.getenv(name)
-        if not value:
-            raise RuntimeError(f"Required environment variable '{name}' is not set.")
-        return value
-
-    # in CI: fetched from GitHub action environment
+    # Supplied by the process environment; locally these come from ecart/.env.
     GO_REST_TOKEN = get_env("GO_REST_TOKEN")
     BASE_URL_API = get_env("BASE_URL_API")

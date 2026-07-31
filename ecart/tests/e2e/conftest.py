@@ -173,7 +173,7 @@ def fetch_test_data():
 @pytest.fixture
 def credentials():
     """Return a secret-backed test user payload for auth scenarios."""
-    return SecretsManager().get_secret("valid_user")
+    return SecretsManager().get_secret()
 
 
 @pytest.fixture()

@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 
 """A helper function which returns the list of test_data"""
@@ -10,3 +11,10 @@ def fetch_products():
     with open(data_path) as f:
         product_data = json.load(f)
         return product_data["products"]
+
+
+def get_env(name: str) -> str:
+    value = os.getenv(name)
+    if not value:
+        raise RuntimeError(f"Required environment variable '{name}' is not set.")
+    return value
