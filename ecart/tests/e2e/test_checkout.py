@@ -18,6 +18,7 @@ class TestCheckout(BaseTest):
     data sets without duplicating code."
     """
 
+    @pytest.mark.regression
     @pytest.mark.smoke
     @pytest.mark.parametrize("products", fetch_products())
     def test_checkout(self, page, products, home_page):
