@@ -26,6 +26,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: test
     timeout-minutes: 60
     env:
       # The name/ARN selects the credential provider; credentials themselves
@@ -109,6 +110,38 @@ jobs:
             --dist loadscope \
             --alluredir=allure-results \
             --junitxml=/automation/output/junit-${{ matrix.test-suite }}.xml
+          
+
+    # ═══════════════════════════════════════════════════════════════════════
+      # GATE: Validate that tests actually ran (not just that pytest executed)
+      # Fails immediately if no tests executed—prevents any downstream uploads
+      # ═══════════════════════════════════════════════════════════════════════
+      - name: Validate Test Execution
+        if: always()
+        run: |
+          JUNIT_FILE="output/junit-${{ matrix.test-suite }}.xml"
+          
+          # Check if JUnit XML was generated
+          if [[ ! -f "$JUNIT_FILE" ]]; then
+            echo "❌ FATAL: No JUnit report found at $JUNIT_FILE"
+            echo "No tests were executed. Aborting all reporting steps."
+            exit 1
+          fi
+          
+          # Extract test count from JUnit XML
+          TEST_COUNT=$(grep -o 'tests="[0-9]*"' "$JUNIT_FILE" | grep -o '[0-9]*' | head -1)
+          
+          if [[ -z "$TEST_COUNT" ]] || [[ "$TEST_COUNT" -eq 0 ]]; then
+            echo "❌ FATAL: No tests were executed. Test count: ${TEST_COUNT:-0}"
+            echo "Aborting all reporting steps."
+            exit 1
+          fi
+          
+          echo "✓ Tests executed: $TEST_COUNT"
+
+      # ═══════════════════════════════════════════════════════════════════════
+      # Only reached if validation passed (tests actually executed)
+      # ═══════════════════════════════════════════════════════════════════════
 
       - name: Generate Allure Report inside Docker Container
         if: always()
@@ -145,8 +178,15 @@ jobs:
             s3://${{ secrets.AWS_S3_BUCKET }}/${{ matrix.test-suite }}/${{ steps.timestamp.outputs.RUN_DATE }}/ \
             --delete
 
+      # ═══════════════════════════════════════════════════════════════════════
+      # Final check: Fail if test assertions failed
+      # (Validation already failed if tests didn't execute, so we only reach
+      # here if tests actually ran)
+      # ═══════════════════════════════════════════════════════════════════════
       - name: Fail Workflow if Tests Failed
         if: steps.tests.outcome == 'failure'
         run: |
-          echo "One or more tests failed."
+          echo "❌ PIPELINE FAILURE: One or more tests failed"
+          echo "   - Review Allure Report: allure-report-${{ matrix.test-suite }}"
+          echo "   - Check JUnit XML: junit-xml-${{ matrix.test-suite }}"
           exit 1
