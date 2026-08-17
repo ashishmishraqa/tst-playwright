@@ -18,3 +18,10 @@ def get_env(name: str) -> str:
     if not value:
         raise RuntimeError(f"Required environment variable '{name}' is not set.")
     return value
+
+"""data utils function to return the content of test data file"""
+def fetch_product_list():
+    file_path = pathlib.Path(__file__).parent.parent / "test_data" / "product_lists.json"
+    with open(file_path) as f:
+        data = json.load(f)
+    return data["product_list"]

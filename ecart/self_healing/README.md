@@ -26,12 +26,12 @@ START → capture_context → propose_candidates → validate_candidates
                                           (report) → report → END
 ```
 
-| Node                 | Responsibility                                              |
-|----------------------|-------------------------------------------------------------|
-| `capture_context`    | Snapshot interactive DOM elements from the live page.       |
-| `propose_candidates` | Ask the configured proposer for ranked alternative selectors.|
-| `validate_candidates`| Accept the first candidate resolving to exactly one visible element. |
-| `report`             | Log the suggestion (old → new) or the failure. No source edits. |
+| Node                  | Responsibility                                                       |
+|-----------------------|----------------------------------------------------------------------|
+| `capture_context`     | Snapshot interactive DOM elements from the live page.                |
+| `propose_candidates`  | Ask the configured proposer for ranked alternative selectors.        |
+| `validate_candidates` | Accept the first candidate resolving to exactly one visible element. |
+| `report`              | Log the suggestion (old → new) or the failure. No source edits.      |
 
 The **cycle** is the point of using a graph: a failed round re-proposes (a real
 LLM can use prior misses to broaden) until it heals or hits `max_rounds`.

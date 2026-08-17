@@ -3,7 +3,7 @@
 ``heal_locator`` is the single function the test framework calls when an action
 fails. It is intentionally forgiving: if LangGraph is not installed, if healing
 is disabled, or if anything goes wrong inside the graph, it returns ``None`` so
-the caller falls back to normal failure behaviour. Healing must never *mask* a
+the caller falls back to normal failure behavior. Healing must never *mask* a
 real bug or break a run that would otherwise just fail cleanly.
 """
 

@@ -5,3 +5,4 @@ class HomePageLocators:
     REGISTER_LINK = "Register"
     SEARCH_BUTTON = ".fa.fa-search"
     ALL_LINKS = "a[href]"
+    CATEGORY = "li.dropdown"

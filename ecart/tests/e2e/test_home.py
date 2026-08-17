@@ -1,9 +1,9 @@
 import pytest
-from playwright.sync_api import expect
-
 from ecart.configs.settings import TestData
 from ecart.tests.test_base import BaseTest
 from ecart.utilities.logger import get_logger
+from playwright.sync_api import expect
+from utilities.data_utils import fetch_product_list
 
 
 class TestHome(BaseTest):
@@ -64,3 +64,15 @@ class TestHome(BaseTest):
         )
         expect(heading).to_have_text(f"Search - {products}")
         self.log.info(f"✓ Search '{products}' | Title: {home_page.page.title()}")
+
+    @pytest.mark.parametrize("product_list", fetch_product_list())
+    def test_category_list(self, home_page, product_list):
+        """
+        Verify: Navigate to category and verify list of products from the expected test data
+        """
+        category_name = product_list["product"]
+        expected_products = product_list["items"]
+        products = home_page.category_list(category_name)
+        self.log.info(f"Navigated to category: {products}")
+        for item in expected_products:
+            assert item in products, "Error! item is not found on the user page"

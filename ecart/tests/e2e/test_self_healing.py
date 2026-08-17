@@ -34,6 +34,7 @@ def login_form(page):
     page.set_content(LOGIN_FORM_HTML)
     return page
 
+
 @pytest.mark.skip(reason="Self-healing requires langgraph")
 def test_heal_locator_suggests_working_selector(login_form):
     """The agent recovers the email field from a stale id."""
@@ -57,7 +58,7 @@ def test_basepage_click_self_heals(login_form):
     assert focused_id == "input-email"
 
 
-@pytest.mark.skip(reason="Self-healing requires langgraph")
+# @pytest.mark.skip(reason="Self-healing requires langgraph")
 def test_unhealable_selector_still_raises(login_form):
     """Garbage with no DOM overlap must not be silently 'healed'."""
     from playwright.sync_api import TimeoutError as PlaywrightTimeoutError

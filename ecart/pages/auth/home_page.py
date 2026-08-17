@@ -1,11 +1,11 @@
 from locators.home_page_locators import HomePageLocators
 from playwright.sync_api import Locator
-
 from ecart.pages.auth.login_page import LoginPage
 from ecart.pages.auth.register_page import RegisterPage
 from ecart.pages.base_page import BasePage
 from ecart.pages.product.product_page import ProductPage
 from ecart.utilities.logger import get_logger
+from ecart.pages.product.mp3_players import Mp3PlayersPage
 
 
 class HomePage(BasePage):
@@ -42,6 +42,10 @@ class HomePage(BasePage):
     def all_links(self) -> Locator:
         return self.page.locator(HomePageLocators.ALL_LINKS)
 
+    @property
+    def category(self):
+        return self.page.locator(HomePageLocators.CATEGORY)
+
     # ---------------------------
     # Actions (page interactions only)
     # ---------------------------
@@ -71,6 +75,19 @@ class HomePage(BasePage):
         self.enter_text(self.search_box, product_name)
         self.click_on(self.search_button)
         return ProductPage(self.page)
+
+
+    def category_list(self, category_name):
+        return self.category.filter(has_text=category_name).locator("a").all_inner_texts()
+
+
+    def navigate_to_mp3_players(self):
+        """Navigate to the MP3 Players page."""
+        self.log.info('Navigating to MP3 players page from home page')
+        self.category.filter(has_text="MP3 Players").hover()
+        self.click_on(self.category.filter(has_text="MP3 Players").locator("a").filter(has_text="Show All MP3 Players"))
+        self.log.info("Clicked on 'Show All MP3 Players' link")
+        return Mp3PlayersPage(self.page)
 
     # ---------------------------
     # Data Getters (optional—only if tests need them)

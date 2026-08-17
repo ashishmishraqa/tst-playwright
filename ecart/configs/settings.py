@@ -31,6 +31,9 @@ class TestData:
     LOGIN_PAGE_TITLE = "Account Login"
     ACCOUNT_PAGE_TITLE = "My Account"
     SUCCESS_REGISTRATION = "Your Account Has Been Created!"
+    NEWSLETTER_PAGE_TITLE = "Newsletter Subscription"
+    MP3_PLAYERS_PAGE_TITLE = "MP3 Players"
+    NEWSLETTER_CONFIRMATION = " Success: Your newsletter subscription has been successfully updated!"
 
     EXCEL_SHEET = "data.xlsx"
     SHEET_NAME = "registration"

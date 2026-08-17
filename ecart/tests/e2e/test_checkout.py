@@ -1,10 +1,9 @@
 import pytest
-from playwright.sync_api import expect
-
 from ecart.configs.settings import TestData
 from ecart.tests.test_base import BaseTest
 from ecart.utilities.data_utils import fetch_products
 from ecart.utilities.logger import get_logger
+from playwright.sync_api import expect
 
 
 class TestCheckout(BaseTest):

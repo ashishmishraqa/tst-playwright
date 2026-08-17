@@ -47,7 +47,6 @@ class BasePage:
 
     def click_on(self, locator: str | Locator):
         target = self._resolve_locator(locator)
-        expect(target).to_be_visible()
         try:
             target.click(timeout=self.DEFAULT_TIMEOUT, force=False)
         except PlaywrightTimeoutError:
@@ -55,12 +54,12 @@ class BasePage:
             # a pre-built Locator carries no recoverable selector text.
             if not isinstance(locator, str):
                 raise
+
             healed = heal_locator(self.page, action="click", failed_selector=locator)
+
             if not healed:
                 raise
-            self.log.warning(
-                "Self-heal: retrying click with %r (was %r)", healed, locator
-            )
+            self.log.warning("Self-heal: retrying click with %r (was %r)", healed, locator)
             healed_locator = self.page.locator(healed)
             healed_locator.wait_for(timeout=self.DEFAULT_TIMEOUT, state="visible")
             healed_locator.click()

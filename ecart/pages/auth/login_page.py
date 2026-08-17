@@ -1,6 +1,5 @@
-from locators.login_page_locators import LoginPageLocators
+from ecart.locators.login_page_locators import LoginPageLocators
 from playwright.sync_api import expect
-
 from ecart.pages.auth.logout_page import LogoutPage
 from ecart.pages.base_page import BasePage
 from ecart.pages.user.account_page import AccountPage
@@ -38,6 +37,9 @@ class LoginPage(BasePage):
             ".alert-danger"
         )  # Assuming error messages are in alert-danger
 
+
+
+
     def navigate_to_login_page(self, url):
         self.log.info(f"Opening Login page: {url}")
         self.go_to(url)
@@ -63,3 +65,5 @@ class LoginPage(BasePage):
         expect(self.error_message).to_contain_text(
             "exceeded allowed number of login attempts"
         )
+
+
